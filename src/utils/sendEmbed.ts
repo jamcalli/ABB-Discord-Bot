@@ -10,8 +10,6 @@ export async function sendEmbed(
 
   ) {
 
-    //const imageUrl = validateAndFixUrl(embedData.cover);
-
     const embed = new EmbedBuilder()
       .setTitle(embedData.title)
       .setURL(audiobookBayUrl+'/'+embedData.id)
@@ -105,12 +103,31 @@ export async function sendEmbed(
       .setColor('#0099ff')
       .setDescription('You will receive notifications regarding your downloads progress. Happy listening!')
       .setImage('https://i.imgur.com/ibmpIeR.png')
-      .setFooter({text: 'Thank you for using AudiobookBay Discord Bot!'});
+      .setFooter({text: 'Thank you for using AudiobookRequester!'});
   
     await interaction.editReply({
       content: `<@${userId}>, your order has been placed and the torrent ${torrent.name} is downloading. You will receive a mention when it is available on Plex.`,
       embeds: [embed],
-      //files: [logoFile],
+      components: [],
+    });
+  }
+
+  export async function senddownloadinitEmbed(
+    interaction: any,
+    userId: string,
+    initialTorrent: { name: string }
+  ) {
+    const embed = new EmbedBuilder()
+      .setTitle(`Order received!`)
+      .setColor('#0099ff')
+      .setDescription('You will receive notifications regarding your downloads progress. Happy listening!')
+      .setImage('https://i.imgur.com/ibmpIeR.png')
+      .setFooter({text: 'Thank you for using AudiobookRequester!'});
+  
+    await interaction.editReply({
+      content: `<@${userId}>, your order has been placed and it is in the queue. ${initialTorrent} will begind downloading shortly. You will receive a mentions on the progress.`,
+      embeds: [embed],
+      components: [],
     });
   }
 
@@ -131,3 +148,30 @@ export async function sendEmbed(
     });
   }
   
+  export async function disableButtons(interaction: any) {
+    const buttonprev = new ButtonBuilder()
+      .setCustomId('button.prev')
+      .setLabel('Prev')
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true); // This disables the button
+  
+    const buttonmore = new ButtonBuilder()
+      .setCustomId('button.moreinfo')
+      .setLabel('Working on it...')
+      .setStyle(ButtonStyle.Success)
+      .setDisabled(true); // This disables the button
+  
+    const buttonnext = new ButtonBuilder()
+      .setCustomId('button.next')
+      .setLabel('Next')
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true); // This disables the button
+  
+    const buttonRow = new ActionRowBuilder<ButtonBuilder>()
+      .addComponents(buttonprev, buttonmore, buttonnext);
+  
+    // Edit the message to update the button
+    await interaction.editReply({
+      components: [buttonRow],
+    });
+  }

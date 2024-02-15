@@ -1,7 +1,7 @@
 import { QBittorrent } from '@ctrl/qbittorrent';
 import dotenv from "dotenv";
 import { exec } from 'child_process';
-import { senddownloadEmbed, senddownloadcompleteEmbed } from './utils/sendEmbed';
+import { senddownloadEmbed, senddownloadcompleteEmbed, senddownloadinitEmbed } from './utils/sendEmbed';
 
 dotenv.config();
 
@@ -26,7 +26,10 @@ export async function downloadMagnet(magnet: string) {
   }
 }
 
-export async function checkAndRemoveCompletedTorrents(qbittorrent: QBittorrent, userId: string, interaction: any) {
+export async function checkAndRemoveCompletedTorrents(qbittorrent: QBittorrent, userId: string, interaction: any, initialTorrent: any) {
+
+  // Notify the user immediately that the download was sent
+  senddownloadinitEmbed(interaction, userId, initialTorrent);
 
   let previousTorrents: any[] = [];
   let intervalId: NodeJS.Timeout;
@@ -51,7 +54,6 @@ export async function checkAndRemoveCompletedTorrents(qbittorrent: QBittorrent, 
           console.log(`Removal result for ${torrent.name}: ${result}`);
 
           // Send a message to the user
-
           senddownloadcompleteEmbed(interaction, userId, torrent);
 
           // Run the curl command
@@ -80,5 +82,4 @@ export async function checkAndRemoveCompletedTorrents(qbittorrent: QBittorrent, 
   };
 
   intervalId = setInterval(checkTorrents, 10000); // Check every 10 seconds
-
 }

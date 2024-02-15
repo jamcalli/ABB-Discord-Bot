@@ -7,7 +7,7 @@ import { getAudiobook } from "../utils/getAudiobook";
 import { testSite } from "../utils/siteTest";
 import { data } from "cheerio/lib/api/attributes";
 import { audiobookBayUrl } from "../constants";
-import { sendEmbed, sendmoreinfoEmbed } from "../utils/sendEmbed";
+import { sendEmbed, sendmoreinfoEmbed, disableButtons } from "../utils/sendEmbed";
 import { getMagnetLink } from "../utils/getmagnet";
 import { downloadMagnet, checkAndRemoveCompletedTorrents, qbittorrent } from "../qbittorrent";
 import { searchAudiobooks } from "../utils/searchAudiobooks";
@@ -175,12 +175,15 @@ client.on('interactionCreate', async (interaction) => {
     }
 
         downloadMagnet(extendedBook.torrent.magnetUrl);
-        const channelId = interaction.channelId;
         const userId = interaction.user.id;
-        await checkAndRemoveCompletedTorrents(qbittorrent, userId, interaction);
+        const initialTorrent = extendedBook.title;
+        await checkAndRemoveCompletedTorrents(qbittorrent, userId, interaction, initialTorrent);
         //await interaction.reply(`Hello, <@${interaction.user.id}>!`)
 
   } else if (interaction.customId === 'button.moreinfo') {
+    // Disable the button
+    disableButtons(interaction);
+
     const id = searchResult.data[index].id;
     const book = await getAudiobook(id);
     extendedBook = {
