@@ -1,0 +1,48 @@
+{
+  "name": "audiobookbay",
+  "version": "2.0.6",
+  "description": "AudioBookBay Scraper JavaScript",
+  "main": "dist/index.js",
+  "types": "dist",
+  "keywords": [
+    "audiobookbay",
+    "audiobook",
+    "torrent",
+    "javascript"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p .",
+    "test": "vitest",
+    "example": "tsx ./playground/usage-example.ts",
+    "sitetest": "tsx ./src/utils/siteTest.ts",
+    "coverage": "vitest run --coverage",
+    "dev": "tsx watch src/bot.ts",
+    "qbit": "tsx src/qbittorrent.ts"
+  },
+  "author": "Valentin Lica",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/licavalentin/audiobookbay"
+  },
+  "dependencies": {
+    "@ctrl/qbittorrent": "^7.1.2",
+    "@types/cheerio": "^0.22.31",
+    "@types/node-fetch": "^2.6.2",
+    "audiobookbay": "^2.0.6",
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0-rc.12",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.2",
+    "node-fetch": "^3.2.10",
+    "tsx": "^4.7.1"
+  },
+  "devDependencies": {
+    "esno": "*",
+    "picocolors": "^1.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.8.2",
+    "vite": "^3.0.9",
+    "vitest": "^0.22.1"
+  }
+}
