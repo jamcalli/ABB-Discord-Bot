@@ -1,9 +1,8 @@
 {
-  "name": "audiobookbay",
+  "name": "audiobookbay-discord-bot",
   "version": "2.0.6",
-  "description": "AudioBookBay Scraper JavaScript",
-  "main": "dist/index.js",
-  "types": "dist",
+  "description": "AudioBookBay Scraper TypeScript DiscordBot",
+  "main": "src/bot.ts",
   "keywords": [
     "audiobookbay",
     "audiobook",
@@ -11,19 +10,14 @@
     "javascript"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -p .",
-    "test": "vitest",
     "example": "tsx ./playground/usage-example.ts",
-    "sitetest": "tsx ./src/utils/siteTest.ts",
-    "coverage": "vitest run --coverage",
-    "dev": "tsx watch src/bot.ts",
-    "qbit": "tsx src/qbittorrent.ts"
+    "dev": "tsx watch src/bot.ts"
   },
-  "author": "Valentin Lica",
-  "license": "ISC",
+  "author": "Jayman McAllister",
+  "license": "GNU",
   "repository": {
     "type": "git",
-    "url": "https://github.com/licavalentin/audiobookbay"
+    "url": "https://github.com/jamcalli/ABB-Discord-Bot"
   },
   "dependencies": {
     "@ctrl/qbittorrent": "^7.1.2",
