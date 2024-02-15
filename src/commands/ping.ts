@@ -2,18 +2,15 @@ import { client } from "../bot"
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import pc from "picocolors"
 import { AudioBookSearchResult } from "../interface/search";
-import { audiobook, search } from "../index";
+import { search } from "../index";
 import { getAudiobook } from "../utils/getAudiobook";
 import { testSite } from "../utils/siteTest";
-import { data } from "cheerio/lib/api/attributes";
 import { audiobookBayUrl } from "../constants";
 import { sendEmbed, sendmoreinfoEmbed, disableButtons } from "../utils/sendEmbed";
-import { getMagnetLink } from "../utils/getmagnet";
 import { downloadMagnet, checkAndRemoveCompletedTorrents, qbittorrent } from "../qbittorrent";
-import { searchAudiobooks } from "../utils/searchAudiobooks";
 import { fixCoverUrls } from "../utils/validateUrl";
 
-export const data1 = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName("scrape")
   .setDescription("Validate spelling. Start with Author.")
   .addStringOption(option =>
