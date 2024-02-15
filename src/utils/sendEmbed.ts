@@ -125,7 +125,7 @@ export async function sendEmbed(
       .setFooter({text: 'Thank you for using AudiobookRequester!'});
   
     await interaction.editReply({
-      content: `<@${userId}>, your order has been placed and it is in the queue. ${initialTorrent} will begind downloading shortly. You will receive a mentions on the progress.`,
+      content: `<@${userId}>, your order has been placed and it is in the queue. ${initialTorrent} will begin downloading shortly. You will receive a mentions on the progress.`,
       embeds: [embed],
       components: [],
     });
