@@ -16,11 +16,11 @@ export const data = new SlashCommandBuilder()
   .setDescription("Validate spelling. Start with Author.")
   .addStringOption(option =>
     option.setName("author")
-      .setDescription("The author to search for")
+      .setDescription("The author to search for.")
       .setRequired(true))
   .addStringOption(option =>  
     option.setName("title")
-      .setDescription("Add title to refine search")
+      .setDescription("Adding a title or key words drastically imrpoves the search results.")
       .setRequired(false)
   );
 
