@@ -1,5 +1,14 @@
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-//import { logoFile } from "../config";
+import logger from '../utils/logger'; 
+
+function trimDescription(description: string): string {
+  const maxLength = 4000;
+  if (description.length > maxLength) {
+    logger.info('Description length exceeds 4000 characters, trimming it.');
+    return description.substring(0, maxLength) + '...';
+  }
+  return description;
+}
 
 export async function sendEmbed(
     interaction: any, 
@@ -38,8 +47,13 @@ export async function sendEmbed(
       .setLabel('Get More Info')
       .setStyle(ButtonStyle.Success);
 
+    const buttonexit = new ButtonBuilder()
+      .setCustomId('button.exit')
+      .setLabel('Exit')
+      .setStyle(ButtonStyle.Danger);
+
     const buttonRow = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(buttonprev, buttonmore, buttonnext);
+      .addComponents(buttonprev, buttonmore, buttonnext, buttonexit);
   
     await interaction.editReply({
       content: `Viewing Audiobook: ${index + 1} of ${searchResult.data.length}`,
@@ -64,7 +78,7 @@ export async function sendEmbed(
       .setTitle(book.title)
       .setURL(audiobookBayUrl+'/'+book.id)
       .setColor('#0099ff')
-      .setDescription(book.description)
+      .setDescription(trimDescription(book.description))
       .setThumbnail(book.cover)
       .addFields([
         {name:'Language', value: book.lang, inline: true},
@@ -153,25 +167,40 @@ export async function sendEmbed(
       .setCustomId('button.prev')
       .setLabel('Prev')
       .setStyle(ButtonStyle.Primary)
-      .setDisabled(true); // This disables the button
+      .setDisabled(true); 
   
     const buttonmore = new ButtonBuilder()
       .setCustomId('button.moreinfo')
       .setLabel('Working on it...')
       .setStyle(ButtonStyle.Success)
-      .setDisabled(true); // This disables the button
+      .setDisabled(true); 
   
     const buttonnext = new ButtonBuilder()
       .setCustomId('button.next')
       .setLabel('Next')
       .setStyle(ButtonStyle.Primary)
-      .setDisabled(true); // This disables the button
+      .setDisabled(true); 
   
     const buttonRow = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(buttonprev, buttonmore, buttonnext);
   
-    // Edit the message to update the button
     await interaction.editReply({
       components: [buttonRow],
     });
+  }
+
+  export async function deleteInteraction(interaction: any) {
+    try {
+      await interaction.editReply({
+        content: [],
+        embeds: [],
+        components: [], 
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        logger.error(`Failed to update message: ${error.message}`);
+      } else {
+        logger.error(`An unexpected error occurred: ${error}`);
+      }
+    }
   }

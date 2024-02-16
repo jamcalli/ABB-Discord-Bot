@@ -1,7 +1,7 @@
 import { QBittorrent } from '@ctrl/qbittorrent';
 import dotenv from "dotenv";
 import { exec } from 'child_process';
-import { senddownloadEmbed, senddownloadcompleteEmbed, senddownloadinitEmbed } from './utils/sendEmbed';
+import { senddownloadEmbed, senddownloadcompleteEmbed, senddownloadinitEmbed } from './sendEmbed';
 
 dotenv.config();
 

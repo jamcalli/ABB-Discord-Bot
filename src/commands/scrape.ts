@@ -1,14 +1,15 @@
 import { client } from "../bot"
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
-import pc from "picocolors"
 import { AudioBookSearchResult } from "../interface/search";
 import { search } from "../index";
 import { getAudiobook } from "../utils/getAudiobook";
 import { testSite } from "../utils/siteTest";
 import { audiobookBayUrl } from "../constants";
-import { sendEmbed, sendmoreinfoEmbed, disableButtons } from "../utils/sendEmbed";
-import { downloadMagnet, checkAndRemoveCompletedTorrents, qbittorrent } from "../qbittorrent";
+import { sendEmbed, sendmoreinfoEmbed, disableButtons, deleteInteraction } from "../utils/sendEmbed";
+import { downloadMagnet, checkAndRemoveCompletedTorrents, qbittorrent } from "../utils/qbittorrent";
 import { fixCoverUrls } from "../utils/validateUrl";
+import logger from '../utils/logger'; 
+
 
 export const data = new SlashCommandBuilder()
   .setName("scrape")
@@ -43,7 +44,7 @@ export const data = new SlashCommandBuilder()
   const searchTerm = searchAuthor;
   const titleFilters = searchTitle ? [searchTitle] : [''];
   
-  console.log(`${pc.green('Order Received!')} - ${pc.gray(`Scraping results for - ${searchAuthor}${titleFilters[0] !== '' ? ' - and title filters: ' + titleFilters : ''}`)}`);
+  logger.info(`${'Order Received!'} - ${`Scraping results for - ${searchAuthor}${titleFilters[0] !== '' ? ' - and title filters: ' + titleFilters : ''}`}`);
 
   async function main() {
 
@@ -64,9 +65,10 @@ export const data = new SlashCommandBuilder()
         searchResult.pagination = nextPage.pagination; // update pagination
       } catch (error) {
         if ((error as Error).message === 'Nothing was found') {
-          console.error(pc.red(`No results found for search term: ${searchTerm}`));
+          logger.error(`No results found for search term: ${searchTerm}`);
           return interaction.editReply(`No results found for author: ${searchTerm}. Please check your spelling and try again.`);
         } else {
+          logger.error(`Search error: ${error}`);
           throw error; // Re-throw the error if it's not the "Nothing was found" error
         }
       }
@@ -93,17 +95,14 @@ export const data = new SlashCommandBuilder()
     //  await new Promise(resolve => setTimeout(resolve, 1000));
 
      await interaction.editReply(`Found ${pos} results for author ${searchTerm}${titleFilters[0] !== '' ? ' - and title filters: ' + titleFilters : ''}!`);
-
-    //  console.log(`${pos} - ${pc.green(item.title)} - ${pc.gray(item.id)}`)
       
       pos += 1;
     }
-    console.log(`${pc.yellow('Search term:')} ${searchTerm}`)
-    console.log(`${pc.yellow('Title Filters:')} ${titleFilters.join(',')}`)
-    console.log(`${pc.yellow('Result Count:')} ${searchResult.data.length}`)
+    logger.info(`${'Search term:'} ${searchTerm}`)
+    logger.info(`${'Title Filters:'} ${titleFilters.join(',')}`)
+    logger.info(`${'Result Count:'} ${searchResult.data.length}`)
 
     searchResult = fixCoverUrls(searchResult);
-
     return searchResult;
 
   }
@@ -142,18 +141,26 @@ export const data = new SlashCommandBuilder()
       let extendedBook: any;
 
 client.on('interactionCreate', async (interaction) => {
+ /* 
+  logger.info(`Interaction: ${JSON.stringify(interaction, (key, value) => 
+    typeof value === 'bigint' ? value.toString() : value
+  )}`);
+*/
   if (!interaction.isButton()) return;
 
-  await interaction.deferUpdate().catch((error) => {
-    if (error instanceof Error) {
-      const discordError = error as any;
-      if (discordError.name === 'DiscordAPIError' && discordError.code === 10062) {
-        console.error('Unable to defer update: Unknown interaction');
-        return;
-      }
-    }
-    throw error;
-  });
+  if (!interaction.isButton()) return;
+
+try {
+  await interaction.deferUpdate();
+} catch (error) {
+  const discordError = error as any;
+  if (discordError.name === 'DiscordAPIError' && discordError.code === 10062) {
+    logger.error('Unable to defer update: Unknown interaction');
+    return;
+  }
+  logger.error(`Error: ${discordError.message}`);
+  throw error;
+}
 
   if (interaction.customId === 'button.next') {
     index++;
@@ -167,7 +174,7 @@ client.on('interactionCreate', async (interaction) => {
     sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
   } else if (interaction.customId === 'button.download') {
     if (!extendedBook) {
-      console.error('More info must be requested before downloading');
+      logger.error('More info must be requested before downloading');
       return;
     }
 
@@ -193,6 +200,8 @@ client.on('interactionCreate', async (interaction) => {
   } else if (interaction.customId === 'button.back') {
     embedData = searchResult.data[index];
     sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
+  } else if (interaction.customId === 'button.exit') {
+    interaction.deleteReply();
   } else {
     embedData = searchResult.data[index];
     sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
@@ -202,12 +211,12 @@ client.on('interactionCreate', async (interaction) => {
     }
 
   } else {
-    console.log('No search results found.');
+    logger.info('No search results found.');
     return interaction.editReply(`No results found for author: ${searchTerm}. Please check your spelling and try again.`);
   }
   
   }).catch((ex) => {
-    console.error(pc.red(`Error: ${ex}`))
+    logger.error(`Error: ${ex}`)
   });
 
 }
