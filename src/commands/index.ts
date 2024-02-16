@@ -1,4 +1,4 @@
-import * as scrape from "./ping";
+import * as scrape from "./scrape";
 
 export const commands = {
   scrape,
