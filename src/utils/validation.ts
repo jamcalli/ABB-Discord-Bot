@@ -2,7 +2,7 @@ import { AudioBookSearchResult } from "../interface/search";
 import logger from './logger'; 
 
 export function validateAndFixUrl(url: string): string | null {
-    const defaultCover = 'https://imgur.com/a/BwUY8lk';
+    const defaultCover = 'https://i.imgur.com/CgjfvMb.png';
 
     // Check if url is empty or '/images/default_cover.jpg'
     if (!url || url === '/images/default_cover.jpg') {
@@ -42,7 +42,7 @@ export function validateAndFixUrl(url: string): string | null {
 }
 
 export function fixCoverUrls(searchResult: AudioBookSearchResult): AudioBookSearchResult {
-    const defaultCover = 'https://imgur.com/a/BwUY8lk';
+    const defaultCover = 'https://i.imgur.com/CgjfvMb.png';
     if (searchResult.data) {
       searchResult.data.forEach((item: Item) => {
         const oldCover = item.cover;
