@@ -1,8 +1,8 @@
 import { AudioBookSearchResult } from "../interface/search";
 import logger from './logger'; 
 
-export function validateAndFixUrl(url: string): string | null {
-    const defaultCover = 'https://i.imgur.com/CgjfvMb.png';
+export function validateAndFixUrl(url: string): string {
+    const defaultCover = 'https://imgur.com/a/BwUY8lk';
 
     // Check if url is empty or '/images/default_cover.jpg'
     if (!url || url === '/images/default_cover.jpg') {
@@ -23,7 +23,7 @@ export function validateAndFixUrl(url: string): string | null {
                 return fixedUrl.replace('///', '//');
             } catch (e) {
                 logger.error(`Could not fix URL: ${url}`);
-                return null;
+                return defaultCover;
             }
         } else if (!url.startsWith('http')) {
             const fixedUrl = 'http://' + url;
@@ -33,10 +33,10 @@ export function validateAndFixUrl(url: string): string | null {
                 return fixedUrl.replace('///', '//');
             } catch (e) {
                 logger.error(`Could not fix URL: ${url}`);
-                return null;
+                return defaultCover;
             }
         } else {
-            return null;
+            return defaultCover;
         }
     }
 }
@@ -47,9 +47,11 @@ export function fixCoverUrls(searchResult: AudioBookSearchResult): AudioBookSear
       searchResult.data.forEach((item: Item) => {
         const oldCover = item.cover;
         const newCover = validateAndFixUrl(oldCover);
-        if (newCover && oldCover !== newCover) {
+        if (newCover === defaultCover || oldCover !== newCover) {
           item.cover = newCover;
           logger.info(`Cover URL corrected: ${oldCover} -> ${item.cover}`);
+        } else if (newCover && oldCover === newCover) {
+          //logger.info(`Cover URL is valid: ${item.cover}`);
         } else {
           item.cover = defaultCover;
           logger.info(`Cover URL not valid, using default: ${defaultCover}`);
