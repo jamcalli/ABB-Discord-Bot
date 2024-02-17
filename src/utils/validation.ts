@@ -1,11 +1,12 @@
 import { AudioBookSearchResult } from "../interface/search";
-import { audiobookBayUrl } from "../constants";
 import logger from './logger'; 
 
 export function validateAndFixUrl(url: string): string | null {
-    // Check if url is '/images/default_cover.jpg'
-    if (url === '/images/default_cover.jpg') {
-        url = audiobookBayUrl + url;
+    const defaultCover = 'https://imgur.com/a/BwUY8lk';
+
+    // Check if url is empty or '/images/default_cover.jpg'
+    if (!url || url === '/images/default_cover.jpg') {
+        return defaultCover;
     }
 
     try {
@@ -41,20 +42,22 @@ export function validateAndFixUrl(url: string): string | null {
 }
 
 export function fixCoverUrls(searchResult: AudioBookSearchResult): AudioBookSearchResult {
+    const defaultCover = 'https://imgur.com/a/BwUY8lk';
     if (searchResult.data) {
       searchResult.data.forEach((item: Item) => {
-        if (item.cover) {
-          const oldCover = item.cover;
-          const newCover = validateAndFixUrl(item.cover);
-          if (newCover && oldCover !== newCover) {
-            item.cover = newCover;
-            logger.info(`Cover URL corrected: ${oldCover} -> ${item.cover}`);
-          }
+        const oldCover = item.cover;
+        const newCover = validateAndFixUrl(oldCover);
+        if (newCover && oldCover !== newCover) {
+          item.cover = newCover;
+          logger.info(`Cover URL corrected: ${oldCover} -> ${item.cover}`);
+        } else {
+          item.cover = defaultCover;
+          logger.info(`Cover URL not valid, using default: ${defaultCover}`);
         }
       });
     }
     return searchResult;
-  }
+}
 
   export function trimSearchResults(searchResult: AudioBookSearchResult): AudioBookSearchResult {
     let corrections = 0;

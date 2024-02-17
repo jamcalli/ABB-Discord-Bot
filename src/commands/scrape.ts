@@ -138,7 +138,7 @@ export async function execute(interaction: CommandInteraction) {
       sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
       
       let extendedBook: any;
-
+      //let hasDeferred = false;
       let previousInteraction: CommandInteraction | null = null;
       let isFirstButtonPress = true;
 
@@ -146,31 +146,40 @@ export async function execute(interaction: CommandInteraction) {
         if (!interaction.isButton()) return;
       
         try {
-          await interaction.deferUpdate();
-        } catch (error) {
-          const discordError = error as any;
-          if (discordError.name === 'DiscordAPIError' && discordError.code === 10062) {
-            logger.error('Unable to defer update: Unknown interaction');
-            return;
+          if (!interaction.deferred && !interaction.replied) {
+            await interaction.deferUpdate().catch((error) => {
+              const discordError = error as any;
+              if (discordError.name === 'DiscordAPIError' && discordError.code === 10062) {
+                logger.error('Unable to defer update: Unknown interaction');
+                return;
+              }
+              logger.error(`Error: ${discordError.message}`);
+              throw error;
+            });
           }
-          logger.error(`Error: ${discordError.message}`);
-          throw error;
+        } catch (error) {
+          // Handle any other errors that might occur
+          if (error instanceof Error) {
+            logger.error(`Error: ${error.message}`);
+          }
         }
       
         if (interaction.customId === 'button.next') {
           index++;
           if (index >= searchResult.data.length) index = 0; // Loop back to the start if we've reached the end
           embedData = searchResult.data[index];
+          if (!interaction.deferred && !interaction.replied) {
+            await interaction.deferUpdate();
+          }
           sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
         } else if (interaction.customId === 'button.prev') {
           index--;
           if (index < 0) index = searchResult.data.length - 1; // Loop back to the end if we've reached the start
           embedData = searchResult.data[index];
-          if (isFirstButtonPress && previousInteraction) {
-            sendEmbed(previousInteraction, embedData, audiobookBayUrl, index, searchResult);
-          } else {
-            sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
+          if (!interaction.deferred && !interaction.replied) {
+            await interaction.deferUpdate();
           }
+          sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
         } else if (interaction.customId === 'button.download') {
           if (!extendedBook) {
             logger.error('More info must be requested before downloading');
@@ -193,9 +202,15 @@ export async function execute(interaction: CommandInteraction) {
             posted: searchResult.data[index].posted,
             cover: searchResult.data[index].cover
           };
+          if (!interaction.deferred && !interaction.replied) {
+            await interaction.deferUpdate();
+          }
           sendmoreinfoEmbed(interaction, extendedBook, audiobookBayUrl, index, searchResult);
         } else if (interaction.customId === 'button.back') {
           embedData = searchResult.data[index];
+          if (!interaction.deferred && !interaction.replied) {
+            await interaction.deferUpdate();
+          }
           sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
         } else if (interaction.customId === 'button.exit') {
           if (isFirstButtonPress && previousInteraction) {
@@ -205,6 +220,9 @@ export async function execute(interaction: CommandInteraction) {
           }
         } else {
           embedData = searchResult.data[index];
+          if (!interaction.deferred && !interaction.replied) {
+            await interaction.deferUpdate();
+          }
           sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
         }
       });
