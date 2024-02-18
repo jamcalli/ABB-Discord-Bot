@@ -5,10 +5,11 @@ import { search } from "../index";
 import { getAudiobook } from "../utils/getAudiobook";
 import { testSite } from "../utils/siteTest";
 import { audiobookBayUrl } from "../constants";
-import { sendEmbed, sendmoreinfoEmbed, disableButtons } from "../utils/sendEmbed";
-import { downloadMagnet, checkAndRemoveCompletedTorrents, qbittorrent } from "../utils/qbittorrent";
+import { sendEmbed, sendmoreinfoEmbed, disableButtons, senderrorEmbed } from "../utils/sendEmbed";
+import { downloadMagnet, addUserTorrent, qbittorrent } from "../utils/qbittorrent";
 import { fixCoverUrls, trimSearchResults } from "../utils/validation";
-import logger from '../utils/logger';
+import { logger } from '../bot';
+import { Mutex } from 'async-mutex';
 
 export const data = new SlashCommandBuilder()
     .setName("scrape")
@@ -31,7 +32,7 @@ export async function execute(interaction: CommandInteraction) {
     const siteIsUp = await testSite();
 
     if (!siteIsUp) {
-        await interaction.editReply(`AudioBookBay appears to be down. Please try again later.`);
+        await senderrorEmbed(interaction)
         return;
     }
 
@@ -133,81 +134,120 @@ export async function execute(interaction: CommandInteraction) {
       });
    
       let index = 0;
-      let embedData = searchResult.data[index];
-            
-      sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
-      
-      let extendedBook: any;
+let embedData = searchResult.data[index];
 
-      let previousInteraction: CommandInteraction | null = null;
-      let isFirstButtonPress = true;
+sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
 
-      client.on('interactionCreate', async (interaction) => {
-        if (!interaction.isButton()) return;
-      
-        try {
-          await interaction.deferUpdate();
-        } catch (error) {
-          const discordError = error as any;
-          if (discordError.name === 'DiscordAPIError' && discordError.code === 10062) {
-            logger.error('Unable to defer update: Unknown interaction');
-            return;
+let extendedBook: any;
+
+let previousInteraction: CommandInteraction | null = interaction;
+let isFirstButtonPress = true;
+const mutex = new Mutex();
+const deferredInteractions = new Set();
+
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  const release = await mutex.acquire();
+
+  try {
+    if (interaction.customId === 'button.exit') {
+      await interaction.deferUpdate();
+      await interaction.deleteReply();
+      previousInteraction = null;
+      release();
+      return;
+    }
+
+    if (!deferredInteractions.has(interaction.id)) {
+      console.log('Before deferring update:', interaction.id);
+      await interaction.deferUpdate();
+      console.log('After deferring update:', interaction.id);
+      deferredInteractions.add(interaction.id);
+    }
+
+    if (interaction.customId === 'button.next') {
+      index++;
+      if (index >= searchResult.data.length) index = 0; // Loop back to the start if we've reached the end
+      embedData = searchResult.data[index];
+      if (isFirstButtonPress && previousInteraction && !previousInteraction.replied) {
+        sendEmbed(previousInteraction, embedData, audiobookBayUrl, index, searchResult);
+      } else {
+        sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
+      }
+    } else if (interaction.customId === 'button.prev') {
+      index--;
+      if (index < 0) index = searchResult.data.length - 1; // Loop back to the end if we've reached the start
+      embedData = searchResult.data[index];
+      if (isFirstButtonPress && previousInteraction && !previousInteraction.replied) {
+        sendEmbed(previousInteraction, embedData, audiobookBayUrl, index, searchResult);
+      } else {
+        sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
+      }
+    } else if (interaction.customId === 'button.download') {
+      if (!extendedBook) {
+        logger.error('More info must be requested before downloading');
+        return;
+      }
+
+      downloadMagnet(extendedBook.torrent.magnetUrl);
+      const userId = interaction.user.id;
+      const initialTorrent = extendedBook.title;
+      addUserTorrent(userId, initialTorrent);
+    } else if (interaction.customId === 'button.moreinfo') {
+      // Disable the button
+      disableButtons(interaction);
+    
+      const isSiteUp = await testSite();
+      if (isSiteUp) {
+        const id = searchResult.data[index].id;
+        const book = await getAudiobook(id);
+        extendedBook = {
+          ...book,
+          id: searchResult.data[index].id,
+          posted: searchResult.data[index].posted,
+          cover: searchResult.data[index].cover
+        };
+
+        if (isFirstButtonPress && previousInteraction && !previousInteraction.replied) {
+
+          console.log('isFirstButtonPress:', isFirstButtonPress);
+          console.log('previousInteraction:', previousInteraction);
+          if (previousInteraction) {
+            console.log('previousInteraction.replied:', previousInteraction.replied);
           }
-          logger.error(`Error: ${discordError.message}`);
-          throw error;
-        }
-      
-        if (interaction.customId === 'button.next') {
-          index++;
-          if (index >= searchResult.data.length) index = 0; // Loop back to the start if we've reached the end
-          embedData = searchResult.data[index];
-          sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
-        } else if (interaction.customId === 'button.prev') {
-          index--;
-          if (index < 0) index = searchResult.data.length - 1; // Loop back to the end if we've reached the start
-          embedData = searchResult.data[index];
-          if (isFirstButtonPress && previousInteraction) {
-            sendEmbed(previousInteraction, embedData, audiobookBayUrl, index, searchResult);
-          } else {
-            sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
-          }
-        } else if (interaction.customId === 'button.download') {
-          if (!extendedBook) {
-            logger.error('More info must be requested before downloading');
-            return;
-          }
-      
-          downloadMagnet(extendedBook.torrent.magnetUrl);
-          const userId = interaction.user.id;
-          const initialTorrent = extendedBook.title;
-          await checkAndRemoveCompletedTorrents(qbittorrent, userId, interaction, initialTorrent);
-        } else if (interaction.customId === 'button.moreinfo') {
-          // Disable the button
-          disableButtons(interaction);
-      
-          const id = searchResult.data[index].id;
-          const book = await getAudiobook(id);
-          extendedBook = {
-            ...book,
-            id: searchResult.data[index].id,
-            posted: searchResult.data[index].posted,
-            cover: searchResult.data[index].cover
-          };
-          sendmoreinfoEmbed(interaction, extendedBook, audiobookBayUrl, index, searchResult);
-        } else if (interaction.customId === 'button.back') {
-          embedData = searchResult.data[index];
-          sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
-        } else if (interaction.customId === 'button.exit') {
-          if (isFirstButtonPress && previousInteraction) {
-            previousInteraction.deleteReply();
-          } else {
-            interaction.deleteReply();
-          }
+
+          sendmoreinfoEmbed(previousInteraction, extendedBook, audiobookBayUrl, index, searchResult);
         } else {
-          embedData = searchResult.data[index];
-          sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
+          sendmoreinfoEmbed(interaction, extendedBook, audiobookBayUrl, index, searchResult);
         }
-      });
+      } else {
+        logger.error('The site is down at getAudiobook. Cannot get the audiobook.');
+        senderrorEmbed(interaction);
+      }
+    } else if (interaction.customId === 'button.back') {
+      embedData = searchResult.data[index];
+      sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
+    } /* else if (interaction.customId === 'button.exit') {
+      interaction.deleteReply();
+    } */ else {
+      embedData = searchResult.data[index];
+      sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
+    }
+  } catch (error) {
+    const discordError = error as any;
+    if (discordError.name === 'DiscordAPIError' && discordError.code === 10062) {
+      console.log('Failed to defer update:', interaction);
+      logger.error('Unable to defer update: Unknown interaction');
+      release();
+      return;
+    }
+    logger.error(`Error: ${discordError.message}`);
+    throw error;
+  } finally {
+    release();
+  }
+});
 
     }
 

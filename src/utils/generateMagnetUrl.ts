@@ -1,4 +1,4 @@
-const generateMagnetUrl = (hash: string,title: string, trackers: string[]):   string | undefined => {
+const generateMagnetUrl = (hash: string, title: string, trackers: string[]):   string | undefined => {
 
     let magnetUrl = undefined;
     if(hash.length > 0) {

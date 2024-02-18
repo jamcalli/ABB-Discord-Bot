@@ -1,7 +1,10 @@
+import { logger } from '../bot'; 
 import { QBittorrent } from '@ctrl/qbittorrent';
 import dotenv from "dotenv";
 import { exec } from 'child_process';
-import { senddownloadEmbed, senddownloadcompleteEmbed, senddownloadinitEmbed } from './sendEmbed';
+//import { senddownloadEmbed, senddownloadcompleteEmbed, senddownloadinitEmbed } from './sendEmbed';
+
+
 
 dotenv.config();
 
@@ -26,55 +29,76 @@ export async function downloadMagnet(magnet: string) {
   }
 }
 
-export async function checkAndRemoveCompletedTorrents(qbittorrent: QBittorrent, userId: string, interaction: any, initialTorrent: any) {
+const userTorrents = new Map<string, string[]>();
 
-  // Notify the user immediately that the download was sent
-  senddownloadinitEmbed(interaction, userId, initialTorrent);
+export function addUserTorrent(userId: string, initialTorrent: any) {
+  const userTorrentsArray = userTorrents.get(userId) || [];
+  if (!userTorrentsArray.includes(initialTorrent.id)) {
+    userTorrentsArray.push(initialTorrent.id);
+    userTorrents.set(userId, userTorrentsArray);
+  }
+}
 
+export async function downloadHandler(qbittorrent: QBittorrent) {
   let previousTorrents: any[] = [];
   let intervalId: NodeJS.Timeout;
+  let wasQueueEmpty = true; // Add this flag
 
   const checkTorrents = async () => {
     const allData = await qbittorrent.getAllData();
     const torrents = allData.torrents;
 
     if (torrents.length === 0) {
-      console.log('No torrents in the queue. Stopping.');
-      clearInterval(intervalId);
+      if (!wasQueueEmpty) { // Only log the message if the queue was not empty before
+        logger.info('No torrents in the queue. Waiting for new torrents.');
+      }
+      wasQueueEmpty = true; // Update the flag
       return;
     }
+
+    wasQueueEmpty = false; // Update the flag
 
     for (const torrent of torrents) {
       const previousTorrent = previousTorrents.find(t => t.id === torrent.id);
 
       if (torrent.state !== 'downloading') {
         if (!previousTorrent || previousTorrent.state === 'downloading') {
-          console.log(`Torrent ${torrent.name} is complete. Removing from client.`);
+          logger.info(`AudioBook: ${torrent.name} is complete. Removing from client.`);
           const result = await qbittorrent.removeTorrent(torrent.id, false);
-          console.log(`Removal result for ${torrent.name}: ${result}`);
+          logger.info(`Removal result for ${torrent.name}: ${result}`);
 
-          // Send a message to the user
-          senddownloadcompleteEmbed(interaction, userId, torrent);
+          // Remove the torrent from the user's array
+          userTorrents.forEach((userTorrentsArray, userId) => {
+            if (userTorrentsArray.includes(torrent.id)) {
+              userTorrents.set(userId, userTorrentsArray.filter(id => id !== torrent.id));
+              logger.info(`Removed AudioBook: ${torrent.name} from User: ${userId}.`); // Log the user ID
+            }
+          });
 
           // Run the curl command
           exec(`curl -s ${PLEX_HOST}library/sections/11/refresh?X-Plex-Token=${PLEX_TOKEN}`, (error, stdout, stderr) => {
             if (error) {
-              console.error(`Error refreshing Plex library: ${error.message}`);
+              logger.error(`Error refreshing Plex library: ${error.message}`);
               return;
             }
           
             if (stderr) {
-              console.error(`Error refreshing Plex library: ${stderr}`);
+              logger.error(`Error refreshing Plex library: ${stderr}`);
               return;
             }
           });
         }
       } else if (!previousTorrent || previousTorrent.state !== 'downloading') {
-        console.log(`Torrent ${torrent.name} is still downloading.`);
+        logger.info(`Audiobook: ${torrent.name} is downloading.`);
 
-        // Send a message to the user
-        senddownloadEmbed(interaction, userId, torrent);
-
+        // Add the torrent to the user's array
+        userTorrents.forEach((userTorrentsArray, userId) => {
+          if (!userTorrentsArray.includes(torrent.id)) {
+            userTorrentsArray.push(torrent.id);
+            userTorrents.set(userId, userTorrentsArray);
+            logger.info(`Added AudioBook: ${torrent.name} to User: ${userId}.`); // Log the user ID
+          }
+        });
       }
     }
 

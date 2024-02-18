@@ -22,7 +22,7 @@ export async function sendEmbed(
     const embed = new EmbedBuilder()
       .setTitle(embedData.title)
       .setURL(audiobookBayUrl+'/'+embedData.id)
-      .setColor('#0099ff')
+      .setColor('#ffcc00')
       .setDescription('Click Get More Info to view more details about this audiobook. Please read the description for information regarding file type etc (when missing from general info). Download button will be available there.')
       .setThumbnail('https://i.imgur.com/ibmpIeR.png')
       .addFields({name:'Language', value: embedData.lang, inline: true})
@@ -77,7 +77,7 @@ export async function sendEmbed(
     const embed = new EmbedBuilder()
       .setTitle(book.title)
       .setURL(audiobookBayUrl+'/'+book.id)
-      .setColor('#0099ff')
+      .setColor('#ffcc00')
       .setDescription(trimDescription(book.description))
       .setThumbnail(book.cover)
       .addFields([
@@ -114,7 +114,7 @@ export async function sendEmbed(
   ) {
     const embed = new EmbedBuilder()
       .setTitle(`Order received!`)
-      .setColor('#0099ff')
+      .setColor('#99cc33')
       .setDescription('You will receive notifications regarding your downloads progress. Happy listening!')
       .setImage('https://i.imgur.com/ibmpIeR.png')
       .setFooter({text: 'Thank you for using AudiobookRequester!'});
@@ -133,7 +133,7 @@ export async function sendEmbed(
   ) {
     const embed = new EmbedBuilder()
       .setTitle(`Order received!`)
-      .setColor('#0099ff')
+      .setColor('#99cc33')
       .setDescription('You will receive notifications regarding your downloads progress. Happy listening!')
       .setImage('https://i.imgur.com/ibmpIeR.png')
       .setFooter({text: 'Thank you for using AudiobookRequester!'});
@@ -152,13 +152,30 @@ export async function sendEmbed(
   ) {
     const embed = new EmbedBuilder()
       .setTitle(`Enjoy your book!`)
-      .setColor('#0099ff')
+      .setColor('#339900')
       .setImage('https://i.imgur.com/ibmpIeR.png')
       .setFooter({text: 'Thank you for using AudioBook Bay Discord Bot!'});
   
     await interaction.editReply({
       content: `<@${userId}>, the torrent ${torrent.name} has completed downloading. Check Plex for the new content.`,
       embeds: [embed],
+    });
+  }
+
+  export async function senderrorEmbed(
+    interaction: any
+  ) {
+    const embed = new EmbedBuilder()
+      .setTitle(`Ohhhhh shit!`)
+      .setDescription(`AudioBook Bay appears to have gone down... Try again shortly!`)
+      .setColor('#cc3300')
+      .setImage('https://i.imgur.com/QTlHUGH.png')
+      .setFooter({text: 'Thank you for using AudioBook Bay Discord Bot!'});
+  
+    await interaction.editReply({
+      content: '',
+      embeds: [embed],
+      components: [],
     });
   }
   
@@ -187,20 +204,4 @@ export async function sendEmbed(
     await interaction.editReply({
       components: [buttonRow],
     });
-  }
-
-  export async function deleteInteraction(interaction: any) {
-    try {
-      await interaction.editReply({
-        content: [],
-        embeds: [],
-        components: [], 
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        logger.error(`Failed to update message: ${error.message}`);
-      } else {
-        logger.error(`An unexpected error occurred: ${error}`);
-      }
-    }
   }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { audiobookBayUrl } from "../constants";
-import logger from '../utils/logger'; 
+import { logger } from '../bot'; 
 
 export async function testSite() {
   return axios.get(audiobookBayUrl, {
