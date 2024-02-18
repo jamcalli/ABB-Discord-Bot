@@ -188,3 +188,19 @@ export async function sendEmbed(
       components: [buttonRow],
     });
   }
+
+  export async function deleteInteraction(interaction: any) {
+    try {
+      await interaction.editReply({
+        content: [],
+        embeds: [],
+        components: [], 
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        logger.error(`Failed to update message: ${error.message}`);
+      } else {
+        logger.error(`An unexpected error occurred: ${error}`);
+      }
+    }
+  }

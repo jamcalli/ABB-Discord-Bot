@@ -138,57 +138,40 @@ export async function execute(interaction: CommandInteraction) {
       sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
       
       let extendedBook: any;
-      //let hasDeferred = false;
+
       let previousInteraction: CommandInteraction | null = null;
       let isFirstButtonPress = true;
 
       client.on('interactionCreate', async (interaction) => {
         if (!interaction.isButton()) return;
       
-        console.log('At start of interactionCreate:', interaction.deferred, interaction.replied);
-
         try {
-          if (!interaction.deferred && !interaction.replied) {
-            //console.log('About to defer interaction:', interaction.id);
-            await interaction.deferUpdate().catch((error) => {
-              const discordError = error as any;
-              if (discordError.name === 'DiscordAPIError' && discordError.code === 10062) {
-                logger.error('Unable to defer update: Unknown interaction');
-                return;
-              }
-              logger.error(`Error: ${discordError.message}`);
-              throw error;
-            });
-          }
+          await interaction.deferUpdate();
         } catch (error) {
-          // Handle any other errors that might occur
-          if (error instanceof Error) {
-            logger.error(`Error: ${error.message}`);
+          const discordError = error as any;
+          if (discordError.name === 'DiscordAPIError' && discordError.code === 10062) {
+            logger.error('Unable to defer update: Unknown interaction');
+            return;
           }
+          logger.error(`Error: ${discordError.message}`);
+          throw error;
         }
       
         if (interaction.customId === 'button.next') {
-          console.log('In button.next block:', interaction.deferred, interaction.replied);
           index++;
           if (index >= searchResult.data.length) index = 0; // Loop back to the start if we've reached the end
           embedData = searchResult.data[index];
-          if (!interaction.deferred && !interaction.replied) {
-            //console.log('About to defer interaction:', interaction.id);
-            await interaction.deferUpdate();
-          }
           sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
         } else if (interaction.customId === 'button.prev') {
-          console.log('In button.prev block:', interaction.deferred, interaction.replied);
           index--;
           if (index < 0) index = searchResult.data.length - 1; // Loop back to the end if we've reached the start
           embedData = searchResult.data[index];
-          if (!interaction.deferred && !interaction.replied) {
-            //console.log('About to defer interaction:', interaction.id);
-            await interaction.deferUpdate();
+          if (isFirstButtonPress && previousInteraction) {
+            sendEmbed(previousInteraction, embedData, audiobookBayUrl, index, searchResult);
+          } else {
+            sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
           }
-          sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
         } else if (interaction.customId === 'button.download') {
-          console.log('In button.download block:', interaction.deferred, interaction.replied);
           if (!extendedBook) {
             logger.error('More info must be requested before downloading');
             return;
@@ -199,7 +182,6 @@ export async function execute(interaction: CommandInteraction) {
           const initialTorrent = extendedBook.title;
           await checkAndRemoveCompletedTorrents(qbittorrent, userId, interaction, initialTorrent);
         } else if (interaction.customId === 'button.moreinfo') {
-          console.log('In button.moreinfo block:', interaction.deferred, interaction.replied);
           // Disable the button
           disableButtons(interaction);
       
@@ -211,34 +193,18 @@ export async function execute(interaction: CommandInteraction) {
             posted: searchResult.data[index].posted,
             cover: searchResult.data[index].cover
           };
-          if (!interaction.deferred && !interaction.replied) {
-            //console.log('About to defer interaction:', interaction.id);
-            await interaction.deferUpdate();
-          }
           sendmoreinfoEmbed(interaction, extendedBook, audiobookBayUrl, index, searchResult);
         } else if (interaction.customId === 'button.back') {
-          console.log('In button.back block:', interaction.deferred, interaction.replied);
           embedData = searchResult.data[index];
-          if (!interaction.deferred && !interaction.replied) {
-            //console.log('About to defer interaction:', interaction.id);
-            await interaction.deferUpdate();
-          }
           sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
         } else if (interaction.customId === 'button.exit') {
-          console.log('In button.exit block:', interaction.deferred, interaction.replied);
           if (isFirstButtonPress && previousInteraction) {
             previousInteraction.deleteReply();
           } else {
-            //console.log('About to defer interaction:', interaction.id);
-            await interaction.deferUpdate();
+            interaction.deleteReply();
           }
         } else {
-          console.log('In else block:', interaction.deferred, interaction.replied);
           embedData = searchResult.data[index];
-          if (!interaction.deferred && !interaction.replied) {
-            //console.log('About to defer interaction:', interaction.id);
-            await interaction.deferUpdate();
-          }
           sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
         }
       });
