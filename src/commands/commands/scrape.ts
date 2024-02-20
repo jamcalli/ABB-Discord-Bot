@@ -62,12 +62,13 @@ async function execute(interaction: CommandInteraction) {
         searchResult.data = searchResult.data.concat(nextPage.data); // add results to original array
         searchResult.pagination = nextPage.pagination; // update pagination
       } catch (error) {
+        logger.error(`Error object: ${JSON.stringify(error)}`);
         if ((error as Error).message === 'Nothing was found') {
           logger.error(`No results found for search term: ${searchTerm}`);
-          return interaction.editReply(`No results found for author: ${searchTerm}. Please check your spelling and try again.`);
+          await interaction.editReply(`No results found for author: ${searchTerm}. Please check your spelling and try again.`);
+          break;
         } else {
           logger.error(`Search error: ${error}`);
-          throw error; // Re-throw the error if it's not the "Nothing was found" error
         }
       }
     }
@@ -84,7 +85,14 @@ async function execute(interaction: CommandInteraction) {
         return allMatch;
       });
     }
-  
+    
+    // Check if no results were found
+    if (searchResult.data.length === 0) {
+      logger.error(`No results found for search term: ${searchTerm}`);
+      await interaction.editReply(`No results found for author: ${searchTerm}${titleFilters[0] !== '' ? ' - and title filters: ' + titleFilters : ''}. Please try another search.`);
+      return; // Exit the function
+    }
+    
     let pos = 1;
     for (const item of searchResult.data) {
       await interaction.editReply(`Found ${pos} results for author ${searchTerm}${titleFilters[0] !== '' ? ' - and title filters: ' + titleFilters : ''}!`);
@@ -127,18 +135,20 @@ async function execute(interaction: CommandInteraction) {
     embedData = searchResult.data[index];
 
     let message;
-try {
-  message = await sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
-} catch (error) {
-  console.error(`Failed to send embed: ${error}`);
-}
-
-const filter = (i: ButtonInteraction) => i.user.id === interaction.user.id;
-const collector = message.createMessageComponentCollector({ filter });
-
-bookBrowser(collector, searchResult);
-
+    try {
+      message = await sendEmbed(interaction, embedData, audiobookBayUrl, index, searchResult);
+    } catch (error) {
+      logger.error(`Failed to send embed: ${error}`);
+    }
     
+    if (message) {
+      const filter = (i: ButtonInteraction) => i.user.id === interaction.user.id;
+      const collector = message.createMessageComponentCollector({ filter });
+    
+      bookBrowser(collector, searchResult);
+    } else {
+      logger.error('Message is undefined');
+    }   
   }
   }
 

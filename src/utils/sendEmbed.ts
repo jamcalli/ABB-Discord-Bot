@@ -10,6 +10,15 @@ function trimDescription(description: string): string {
   return description;
 }
 
+function trimTitle(title: string): string {
+  const maxLength = 256;
+  if (title.length > maxLength) {
+    logger.info('Title length exceeds 256 characters, trimming it.');
+    return title.substring(0, maxLength - 3) + '...';
+  }
+  return title;
+}
+
 export async function sendEmbed(
   interaction: any, 
   embedData: any, 
@@ -18,7 +27,7 @@ export async function sendEmbed(
   searchResult: any
 ) {
   const embed = new EmbedBuilder()
-  .setTitle(embedData.title)
+  .setTitle(trimTitle(embedData.title))
   .setURL(audiobookBayUrl+'/'+embedData.id)
   .setColor('#ffcc00')
   .setDescription('Click Get More Info to view more details about this audiobook. Please read the description for information regarding file type etc (when missing from general info). Download button will be available there.')
@@ -76,7 +85,7 @@ const buttonRow = new ActionRowBuilder<ButtonBuilder>()
     book.specs.bitrate = book.specs.bitrate || 'NA';
   
     const embed = new EmbedBuilder()
-      .setTitle(book.title)
+      .setTitle(trimTitle(book.title))
       .setURL(audiobookBayUrl+'/'+book.id)
       .setColor('#ffcc00')
       .setDescription(trimDescription(book.description))

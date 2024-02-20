@@ -1,10 +1,9 @@
 import { URLSearchParams } from "url";
 import { audiobookBayUrl } from "./constants";
 import { AudiobookDetails } from "./interface/audiobookDetails";
-
+import { logger } from './bot';
 import { Categories, Tags } from "./interface/explore";
 import { AudioBookSearchResult, SearchIn } from "./interface/search";
-
 import { getAudiobook } from "./utils/getAudiobook";
 import { searchAudiobooks } from "./utils/searchAudiobooks";
 
@@ -33,8 +32,15 @@ export const search = async (
 
     return await searchAudiobooks(url);
   } catch (error) {
-    console.error(error);
-    throw new Error("Nothing was found");
+    logger.error(`Error object: ${JSON.stringify(error)}`);
+    if (error instanceof Error && error.message === 'Nothing was found') {
+      logger.error(`No results found for search term: ${query}`);
+      throw error;
+    } else if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error("An error occurred during search");
+    }
   }
 };
 

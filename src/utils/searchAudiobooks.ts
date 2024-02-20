@@ -1,8 +1,8 @@
 import cheerio from "cheerio";
 import fetch from "node-fetch";
 import { audiobookBayUrl } from "../constants";
-
 import { Audiobook, AudioBookSearchResult, Pagination } from "../interface/search";
+import { logger } from '../bot';
 
 /**
  * Search Audiobooks
@@ -18,7 +18,9 @@ const searchAudiobooks = async (url: string, domain?: string): Promise<AudioBook
 
   // Nothing is Found Error
   if ($(`#content h3`).text().trim() === "Not Found") {
-    throw new Error("Nothing was found");
+    const errorMessage = "Nothing was found";
+    //logger.error(errorMessage);
+    return Promise.reject(new Error(errorMessage));
   }
   // Get Details for each audiobook
   const data: Audiobook[] = [];
