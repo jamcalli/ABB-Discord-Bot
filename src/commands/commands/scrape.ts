@@ -107,29 +107,40 @@ async function execute(interaction: CommandInteraction) {
   
     if (searchResult && 'data' in searchResult && searchResult.data.length > 0) {
       interface SearchResultItem {
+        lang: string;
         info: {
           format: string;
         };
       }
-  
-      if (searchResult && 'data' in searchResult) {
-        searchResult.data.sort((a: SearchResultItem, b: SearchResultItem) => {
-          const formatA = a.info.format;
-          const formatB = b.info.format;
-  
-          if (formatA === 'M4B' && formatB !== 'M4B') {
-            return -1; // A comes first
-          } else if (formatA !== 'M4B' && formatB === 'M4B') {
-            return 1; // B comes first
-          } else if (formatA === 'MP3' && formatB !== 'MP3') {
-            return -1; // A comes first
-          } else if (formatA !== 'MP3' && formatB === 'MP3') {
-            return 1; // B comes first
-          } else {
-            return 0; // Equal priority
-          }
-        });
+
+if (searchResult && 'data' in searchResult) {
+  searchResult.data.sort((a: SearchResultItem, b: SearchResultItem) => {
+    const langA = a.lang;
+    const langB = b.lang;
+    const formatA = a.info.format;
+    const formatB = b.info.format;
+
+    // Prioritize English language
+    if (langA === 'English' && langB !== 'English') {
+      return -1; // A comes first
+    } else if (langA !== 'English' && langB === 'English') {
+      return 1; // B comes first
+    } else {
+      // If languages are equal, prioritize by format
+      if (formatA === 'M4B' && formatB !== 'M4B') {
+        return -1; // A comes first
+      } else if (formatA !== 'M4B' && formatB === 'M4B') {
+        return 1; // B comes first
+      } else if (formatA === 'MP3' && formatB !== 'MP3') {
+        return -1; // A comes first
+      } else if (formatA !== 'MP3' && formatB === 'MP3') {
+        return 1; // B comes first
+      } else {
+        return 0; // Equal priority
       }
+    }
+  });
+}
     }
 
     embedData = searchResult.data[index];
