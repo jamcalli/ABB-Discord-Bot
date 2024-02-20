@@ -1,9 +1,10 @@
 import { logger } from '../bot'; 
 import { QBittorrent } from '@ctrl/qbittorrent';
 import dotenv from "dotenv";
-import { exec } from 'child_process';
+import { exec as execCb } from 'child_process';
 import { ButtonInteraction } from 'discord.js';
 import { senddownloadEmbed, senddownloadcompleteDM } from './sendEmbed';
+import { promisify } from 'util';
 
 dotenv.config();
 
@@ -38,6 +39,23 @@ export function addUserTorrent(userId: string, initialTorrent: any, i: ButtonInt
   }
 }
 
+const exec = promisify(execCb);
+
+async function runCurlCommand(): Promise<void> {
+  try {
+    const { stdout, stderr } = await exec(`curl -s ${PLEX_HOST}library/sections/11/refresh?X-Plex-Token=${PLEX_TOKEN}`);
+    
+    if (stderr) {
+      logger.error(`Error refreshing Plex library: ${stderr}`);
+      return;
+    }
+
+    logger.info(stdout);
+  } catch (error) {
+    logger.error(`Error refreshing Plex library: ${(error as Error).message}`);
+  }
+}
+
 export async function downloadHandler(client: any, qbittorrent: QBittorrent) {
   // replace 'any' with the actual type of your Discord client
   let previousTorrents: any[] = [];
@@ -65,17 +83,7 @@ export async function downloadHandler(client: any, qbittorrent: QBittorrent) {
           logger.info(`AudioBook: ${torrent.name} is complete. Removing from client.`);
 
           // Run the curl command
-          exec(`curl -s ${PLEX_HOST}library/sections/11/refresh?X-Plex-Token=${PLEX_TOKEN}`, (error, stdout, stderr) => {
-            if (error) {
-              logger.error(`Error refreshing Plex library: ${error.message}`);
-              return;
-            }
-          
-            if (stderr) {
-              logger.error(`Error refreshing Plex library: ${stderr}`);
-              return;
-            }
-          });
+          await runCurlCommand();
 
           const result = await qbittorrent.removeTorrent(torrent.id, false);
           logger.info(`Removal result for ${torrent.name}: ${result}`);
