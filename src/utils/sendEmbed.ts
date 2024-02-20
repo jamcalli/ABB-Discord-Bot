@@ -1,5 +1,5 @@
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import logger from '../utils/logger'; 
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, MessageComponentInteraction } from "discord.js";
+import { logger } from '../bot'; 
 
 function trimDescription(description: string): string {
   const maxLength = 4000;
@@ -11,56 +11,57 @@ function trimDescription(description: string): string {
 }
 
 export async function sendEmbed(
-    interaction: any, 
-    embedData: any, 
-    audiobookBayUrl: string, 
-    index: number, 
-    searchResult: any
+  interaction: any, 
+  embedData: any, 
+  audiobookBayUrl: string, 
+  index: number, 
+  searchResult: any
+) {
+  const embed = new EmbedBuilder()
+  .setTitle(embedData.title)
+  .setURL(audiobookBayUrl+'/'+embedData.id)
+  .setColor('#ffcc00')
+  .setDescription('Click Get More Info to view more details about this audiobook. Please read the description for information regarding file type etc (when missing from general info). Download button will be available there.')
+  .setThumbnail('https://i.imgur.com/ibmpIeR.png')
+  .addFields({name:'Language', value: embedData.lang, inline: true})
+  .addFields({name:'Format', value: embedData.info.format, inline: true})
+  .addFields({name: 'Bitrate', value: embedData.info.unit, inline: true})
+  .addFields({name: 'Size', value: embedData.info.size+embedData.info.sizeUnit, inline: true})
+  .setImage(embedData.cover)
+  .setFooter({text: 'Posted on '+embedData.posted});
 
-  ) {
+const buttonprev = new ButtonBuilder()
+  .setCustomId('button.prev')
+  .setLabel('Prev')
+  .setStyle(ButtonStyle.Primary);
 
-    const embed = new EmbedBuilder()
-      .setTitle(embedData.title)
-      .setURL(audiobookBayUrl+'/'+embedData.id)
-      .setColor('#ffcc00')
-      .setDescription('Click Get More Info to view more details about this audiobook. Please read the description for information regarding file type etc (when missing from general info). Download button will be available there.')
-      .setThumbnail('https://i.imgur.com/ibmpIeR.png')
-      .addFields({name:'Language', value: embedData.lang, inline: true})
-      .addFields({name:'Format', value: embedData.info.format, inline: true})
-      .addFields({name: 'Bitrate', value: embedData.info.unit, inline: true})
-      .addFields({name: 'Size', value: embedData.info.size+embedData.info.sizeUnit, inline: true})
-      .setImage(embedData.cover)
-      .setFooter({text: 'Posted on '+embedData.posted});
-  
-    const buttonprev = new ButtonBuilder()
-      .setCustomId('button.prev')
-      .setLabel('Prev')
-      .setStyle(ButtonStyle.Primary);
-  
-    const buttonnext = new ButtonBuilder()
-      .setCustomId('button.next')
-      .setLabel('Next')
-      .setStyle(ButtonStyle.Primary);
+const buttonnext = new ButtonBuilder()
+  .setCustomId('button.next')
+  .setLabel('Next')
+  .setStyle(ButtonStyle.Primary);
 
-    const buttonmore = new ButtonBuilder()
-      .setCustomId('button.moreinfo')
-      .setLabel('Get More Info')
-      .setStyle(ButtonStyle.Success);
+const buttonmore = new ButtonBuilder()
+  .setCustomId('button.moreinfo')
+  .setLabel('Get More Info')
+  .setStyle(ButtonStyle.Success);
 
-    const buttonexit = new ButtonBuilder()
-      .setCustomId('button.exit')
-      .setLabel('Exit')
-      .setStyle(ButtonStyle.Danger);
+const buttonexit = new ButtonBuilder()
+  .setCustomId('button.exit')
+  .setLabel('Exit')
+  .setStyle(ButtonStyle.Danger);
 
-    const buttonRow = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(buttonprev, buttonmore, buttonnext, buttonexit);
-  
-    await interaction.editReply({
-      content: `Viewing Audiobook: ${index + 1} of ${searchResult.data.length}`,
-      embeds: [embed],
-      components: [buttonRow],
-    });
-  }
+const buttonRow = new ActionRowBuilder<ButtonBuilder>()
+  .addComponents(buttonprev, buttonmore, buttonnext, buttonexit);
+
+  const message = await interaction.editReply({
+    content: `Viewing Audiobook: ${index + 1} of ${searchResult.data.length}`,
+    embeds: [embed],
+    components: [buttonRow],
+    fetchReply: true,
+  });
+
+  return message;
+}
 
   export async function sendmoreinfoEmbed(
     interaction: any, 
@@ -100,11 +101,14 @@ export async function sendEmbed(
     const buttonRow = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(buttonback, buttondownloadAudiobook);
   
-    await interaction.editReply({
+const message = await interaction.editReply({
       content: `Viewing Audiobook: ${index + 1} of ${searchResult.data.length}`,
       embeds: [embed],
       components: [buttonRow],
+      fetchReply: true,
     });
+  
+    return message;
   }
 
   export async function senddownloadEmbed(
@@ -116,11 +120,11 @@ export async function sendEmbed(
       .setTitle(`Order received!`)
       .setColor('#99cc33')
       .setDescription('You will receive notifications regarding your downloads progress. Happy listening!')
-      .setImage('https://i.imgur.com/ibmpIeR.png')
+      .setImage('https://i.imgur.com/dUYWB1u.png')
       .setFooter({text: 'Thank you for using AudiobookRequester!'});
   
     await interaction.editReply({
-      content: `<@${userId}>, your order has been placed and the torrent ${torrent.name} is downloading. You will receive a mention when it is available on Plex.`,
+      content: `<@${userId}>, your order has been placed and the AudioBook ${torrent.name} is downloading. You will receive a DM when it is available on Plex.`,
       embeds: [embed],
       components: [],
     });
@@ -145,8 +149,8 @@ export async function sendEmbed(
     });
   }
 
-  export async function senddownloadcompleteEmbed(
-    interaction: any,
+  export async function senddownloadcompleteDM(
+    client: any,
     userId: string,
     torrent: { name: string }
   ) {
@@ -156,8 +160,10 @@ export async function sendEmbed(
       .setImage('https://i.imgur.com/ibmpIeR.png')
       .setFooter({text: 'Thank you for using AudioBook Bay Discord Bot!'});
   
-    await interaction.editReply({
-      content: `<@${userId}>, the torrent ${torrent.name} has completed downloading. Check Plex for the new content.`,
+      const user = await client.users.fetch(userId);
+
+    await user.send({
+      content: `The AudioBook ${torrent.name} has completed downloading. Check Plex for the new content.`,
       embeds: [embed],
     });
   }
