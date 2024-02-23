@@ -179,8 +179,16 @@ async function runCurlCommand(): Promise<void> {
 
 // Function to handle downloads
 export async function downloadHandler(client: Client, qbittorrent: QBittorrent): Promise<void> {
-  // Load the cache when the program starts
-  let isDownloading = loadCache();
+    // Load the cache when the program starts
+    //const cache = loadCache();
+
+    // Clear the isDownloading map and populate it with the cache data only if the cache is not empty
+    //if (cache.size > 0) {
+    //  isDownloading.clear();
+    //  for (const [key, value] of cache.entries()) {
+    //    isDownloading.set(key, value);
+    //  }
+    //}
 
   // Initialize the previous torrents array and the wasQueueEmpty flag
   let previousTorrents: TorrentData[] = [];
@@ -250,7 +258,7 @@ export async function downloadHandler(client: Client, qbittorrent: QBittorrent):
       previousTorrents = torrents;
 
       // Save the cache after each check
-      saveCache(isDownloading);
+      //saveCache(isDownloading);
     } catch (error) {
       // If an error occurred, log it
       logger.error(`Error while checking torrents: ${(error as Error).message}, Stack: ${(error as Error).stack}`);
@@ -261,6 +269,7 @@ export async function downloadHandler(client: Client, qbittorrent: QBittorrent):
   setInterval(checkTorrents, 10000); 
 }
 
+/*
 // Define the path to the cache file
 const cacheFilePath = path.resolve(__dirname, '../cache/isDownloadingCache.json');
 
@@ -270,27 +279,44 @@ fs.mkdirSync(dirPath, { recursive: true });
 
 // Function to load the cache
 function loadCache(): Map<string, DownloadingData> {
+  const cache = new Map<string, DownloadingData>();
   try {
-    // Read the cache file
-    const data = fs.readFileSync(cacheFilePath, 'utf8');
-    // Parse the JSON data and convert it to a Map
-    const jsonData = JSON.parse(data);
-    return new Map(Object.entries(jsonData));
+    // Check if the file exists and is not empty
+    if (fs.existsSync(cacheFilePath) && fs.statSync(cacheFilePath).size > 0) {
+      // Read the cache file
+      const lines = fs.readFileSync(cacheFilePath, 'utf8').split('\n');
+      // Parse each line and add it to the cache
+      for (const line of lines) {
+        if (line) {
+          const [key, value] = JSON.parse(line);
+          cache.set(key, value);
+        }
+      }
+    }
   } catch (error) {
-    // If an error occurred, return an empty Map
-    return new Map();
+    // If an error occurred, log it and return an empty Map
+    console.error('Error loading cache:', error);
   }
+  return cache;
 }
 
 // Function to save the cache
 function saveCache(isDownloading: Map<string, DownloadingData>): void {
-  // Convert the Map to a JSON object and stringify it
-  const data = JSON.stringify(Array.from(isDownloading.entries()));
-  // Write the data to the cache file
-  fs.writeFileSync(cacheFilePath, data);
+  // Clear the cache file
+  fs.writeFileSync(cacheFilePath, '');
+
+  // Write each entry to the cache file
+  for (const [key, value] of isDownloading.entries()) {
+    // Convert the entry to a JSON object and stringify it
+    const data = JSON.stringify([key, value]);
+    // Append the data to the cache file
+    fs.appendFileSync(cacheFilePath, data + '\n');
+  }
 }
 
 // Save the cache when the program ends
-process.on('beforeExit', () => {
+process.on('exit', () => {
+  logger.info('Program is exiting, saving cache');
   saveCache(isDownloading);
 });
+*/
