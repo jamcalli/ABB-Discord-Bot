@@ -1,5 +1,5 @@
 import { logger } from '../bot'; 
-import { AudioBookSearchResult } from "../interface/search";
+import { AudioBookSearchResult } from "../interface/search.interface";
 
 
 export function validateAndFixUrl(url: string): string {

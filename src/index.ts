@@ -1,9 +1,9 @@
 import { URLSearchParams } from "url";
 import { audiobookBayUrl } from "./constants";
-import { AudiobookDetails } from "./interface/audiobookDetails";
+import { AudiobookDetails } from "./interface/audiobookDetails.interface";
 import { logger } from './bot';
 import { Categories, Tags } from "./interface/explore";
-import { AudioBookSearchResult, SearchIn } from "./interface/search";
+import { AudioBookSearchResult, SearchIn } from "./interface/search.interface";
 import { getAudiobook } from "./utils/getAudiobook";
 import { searchAudiobooks } from "./utils/searchAudiobooks";
 

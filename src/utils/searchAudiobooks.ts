@@ -1,7 +1,7 @@
 import cheerio from "cheerio";
 import fetch from "node-fetch";
 import { audiobookBayUrl } from "../constants";
-import { Audiobook, AudioBookSearchResult, Pagination } from "../interface/search";
+import { Audiobook, AudioBookSearchResult, Pagination } from "../interface/search.interface";
 import { logger } from '../bot';
 
 /**

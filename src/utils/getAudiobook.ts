@@ -2,7 +2,7 @@ import cheerio from "cheerio";
 import fetch from "node-fetch";
 import { audiobookBayUrl } from "../constants";
 
-import { AudiobookDetails } from "../interface/audiobookDetails";
+import { AudiobookDetails } from "../interface/audiobookDetails.interface";
 import { generateMagnetUrl } from "./generateMagnetUrl";
 
 

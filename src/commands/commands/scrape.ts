@@ -1,5 +1,5 @@
 import { CommandInteraction, SlashCommandBuilder, ButtonInteraction, Collection, MessageComponentInteraction } from "discord.js";
-import { AudioBookSearchResult } from "../../interface/search";
+import { AudioBookSearchResult } from "../../interface/search.interface";
 import { search } from "../../index";
 import { testSite } from "../../utils/siteTest";
 import { audiobookBayUrl } from "../../constants";
@@ -7,7 +7,7 @@ import { sendEmbed, senderrorEmbed } from "../../utils/sendEmbed";
 import { fixCoverUrls, trimSearchResults } from "../../utils/validation";
 import { logger } from '../../bot';
 import { bookBrowser } from "../../events/bookbrowser";
-import { SearchResultItem } from "../../interface/scrape.interfaces";
+import { SearchResultItem } from "../../interface/scrape.interface";
 
 // Define the command data 
 const data = new SlashCommandBuilder()
