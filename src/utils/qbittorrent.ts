@@ -219,26 +219,29 @@ export async function downloadHandler(client: Client, qbittorrent: QBittorrent):
         // Find the torrent in the previous torrents array
         const previousTorrent = previousTorrents.find(t => t.id === torrent.id);
 
-        // If the torrent is not downloading
-        if (torrent.state !== 'downloading') {
-          // If the torrent was not in the previous torrents array or it was downloading
-          if (!previousTorrent || previousTorrent.state === 'downloading') {
-            // Log a message, run the curl command, remove the torrent from qbittorrent, and log the result
-            logger.info(`AudioBook: ${torrent.name} is complete. Removing from client.`);
-            await runCurlCommand();
-            const result = await qbittorrent.removeTorrent(torrent.id, false);
-            logger.info(`Removal result for ${torrent.name}: ${result}`);
+      // If the torrent is not downloading
+      if (torrent.state !== 'downloading') {
+        // If the torrent was not in the previous torrents array or it was downloading
+        if (!previousTorrent || previousTorrent.state === 'downloading') {
+          // Log a message, run the curl command, remove the torrent from qbittorrent, and log the result
+          logger.info(`AudioBook: ${torrent.name} is complete. Removing from client.`);
+          await runCurlCommand();
+          const result = await qbittorrent.removeTorrent(torrent.id, false);
+          logger.info(`Removal result for ${torrent.name}: ${result}`);
 
-            // If the torrent is in the isDownloading map
-            if (isDownloading.has(torrent.id)) {
-              // Get the user data, send a download complete DM, remove the torrent from the isDownloading map, and log the number of items in the map
-              const userData: DownloadingData = isDownloading.get(torrent.id)!;
+          // If the torrent is in the isDownloading map
+          if (isDownloading.has(torrent.id)) {
+            // Get the user data, send a download complete DM, remove the torrent from the isDownloading map, and log the number of items in the map
+            const userData: DownloadingData = isDownloading.get(torrent.id)!;
+            // Only send the DM if the torrent has just finished downloading
+            if (!previousTorrent || previousTorrent.state === 'downloading') {
               await senddownloadcompleteDM(client, userData.userId, { name: userData.bookName });
-              isDownloading.delete(torrent.id);
-              logger.info('Number of items Downloading: ' + isDownloading.size);
             }
+            isDownloading.delete(torrent.id);
+            logger.info('Number of items Downloading: ' + isDownloading.size);
           }
-        } 
+        }
+      }
         // If the torrent is downloading and it's a new download
         else if (!previousTorrent || previousTorrent.state !== 'downloading') {
           // If the torrent is in the isDownloading map
