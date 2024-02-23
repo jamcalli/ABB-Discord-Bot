@@ -94,10 +94,20 @@ async function execute(interaction: CommandInteraction) {
     }
     
     let pos = 1;
+    let lastUpdateTime = Date.now();
+    
     for (const item of searchResult.data) {
-      await interaction.editReply(`Found ${pos} results for author ${searchTerm}${titleFilters[0] !== '' ? ' - and title filters: ' + titleFilters : ''}!`);
+      const now = Date.now();
+      if (now - lastUpdateTime >= 5000) { // 5000 milliseconds = 5 seconds
+        await interaction.editReply(`Found ${pos} results for author ${searchTerm}${titleFilters[0] !== '' ? ' - and title filters: ' + titleFilters : ''}!`);
+        lastUpdateTime = now;
+      }
       pos += 1;
     }
+    
+    // Send a final update after the loop, in case the last few items didn't trigger an update
+    await interaction.editReply(`Found ${pos - 1} results for author ${searchTerm}${titleFilters[0] !== '' ? ' - and title filters: ' + titleFilters : ''}!`);
+    
     logger.info(`${'Search term:'} ${searchTerm}`)
     logger.info(`${'Title Filters:'} ${titleFilters.join(',')}`)
     logger.info(`${'Result Count:'} ${searchResult.data.length}`)

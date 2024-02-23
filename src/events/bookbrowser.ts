@@ -2,10 +2,9 @@ import { getAudiobook } from "../utils/getAudiobook";
 import { testSite } from "../utils/siteTest";
 import { audiobookBayUrl } from "../constants";
 import { sendEmbed, sendmoreinfoEmbed, disableButtons, senderrorEmbed, senddownloadinitEmbed } from "../utils/sendEmbed";
-import { downloadMagnet, addUserTorrent } from "../utils/qbittorrent";
+import { queueUserTorrent } from "../utils/qbittorrent";
 import { logger } from '../bot';
-
-import { InteractionCollector, ButtonInteraction, Interaction  } from 'discord.js';
+import { InteractionCollector, ButtonInteraction } from 'discord.js';
 
 export function bookBrowser(
     collector: InteractionCollector<ButtonInteraction>,
@@ -86,14 +85,11 @@ export function bookBrowser(
       logger.error('More info must be requested before downloading');
       return;
     }
-    logger.debug(`Downloading magnet: ${extendedBook.torrent.magnetUrl}`);
-    downloadMagnet(extendedBook.torrent.magnetUrl);
     const userId = i.user.id;
-    const initialTorrent = extendedBook.title;
-    addUserTorrent(userId, initialTorrent, i);
-    senddownloadinitEmbed(i, userId, initialTorrent);
-  
-    // Stop the collector after a download has been initiated
+    const bookName = extendedBook.title;
+    const magnetUrl = extendedBook.torrent.magnetUrl;
+    senddownloadinitEmbed(i, userId, bookName);
+    queueUserTorrent(userId, bookName, i, magnetUrl);
     collector.stop();
   }
   
