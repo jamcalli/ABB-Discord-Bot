@@ -1,12 +1,26 @@
 import winston, { transport } from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 export function initializeLogger() {
   // Define an array to hold the transport streams for Winston
-  const transports: transport[] = [
+  const transports: (DailyRotateFile | winston.transports.ConsoleTransportInstance)[] = [
     // File transport for error logs
-    new winston.transports.File({ filename: './logs/error.log', level: 'error' }),
+    new DailyRotateFile({
+      filename: './logs/error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD-HH',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '3d',
+      level: 'error'
+    }),
     // File transport for combined logs
-    new winston.transports.File({ filename: './logs/combined.log' }),
+    new DailyRotateFile({
+      filename: './logs/combined-%DATE%.log',
+      datePattern: 'YYYY-MM-DD-HH',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '3d'
+    }),
   ];
 
   // If the environment is not production, add a console transport
