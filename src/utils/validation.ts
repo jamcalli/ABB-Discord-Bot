@@ -1,11 +1,16 @@
 import { logger } from '../bot'; 
-import { AudioBookSearchResult } from "../interface/search.interface";
+import { AudioBookSearchResult, Audiobook } from "../interface/search.interface";
 
-
+/**
+ * Function to validate and fix a URL.
+ * If the URL is empty or equals '/images/default_cover.jpg', it returns a default cover URL.
+ * If the URL is valid, it returns the URL.
+ * If the URL is invalid, it tries to fix the URL and returns the fixed URL if it's valid.
+ * If the URL can't be fixed, it returns the default cover URL.
+ */
 export function validateAndFixUrl(url: string): string {
     const defaultCover = 'https://i.imgur.com/CgjfvMb.png';
 
-    // Check if url is empty or '/images/default_cover.jpg'
     if (!url || url === '/images/default_cover.jpg') {
         return defaultCover;
     }
@@ -42,10 +47,15 @@ export function validateAndFixUrl(url: string): string {
     }
 }
 
+/**
+ * Function to fix the cover URLs in a search result.
+ * It iterates over the items in the search result data and fixes the cover URL for each item.
+ * If the cover URL is corrected or not valid, it logs the old and new cover URLs.
+ */
 export function fixCoverUrls(searchResult: AudioBookSearchResult): AudioBookSearchResult {
     const defaultCover = 'https://i.imgur.com/CgjfvMb.png';
     if (searchResult.data) {
-      searchResult.data.forEach((item: Item) => {
+      searchResult.data.forEach((item: Audiobook) => {
         const oldCover = item.cover;
         const newCover = validateAndFixUrl(oldCover);
         if (newCover === defaultCover || oldCover !== newCover) {
@@ -62,6 +72,12 @@ export function fixCoverUrls(searchResult: AudioBookSearchResult): AudioBookSear
     return searchResult;
 }
 
+/**
+ * Function to trim the search results.
+ * It maps over the items in the search result data and trims each item.
+ * If a property of an item is missing, it sets the property to 'NA'.
+ * It counts the number of corrections made and logs the number.
+ */
 export function trimSearchResults(searchResult: AudioBookSearchResult): AudioBookSearchResult {
   let corrections = 0;
 
@@ -82,7 +98,6 @@ export function trimSearchResults(searchResult: AudioBookSearchResult): AudioBoo
       }
     };
 
-    // Count corrections
     corrections += Object.values(newItem).filter(value => value === 'NA').length;
     corrections += Object.values(newItem.info).filter(value => value === 'NA').length;
 

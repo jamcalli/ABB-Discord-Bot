@@ -1,6 +1,8 @@
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, MessageComponentInteraction } from "discord.js";
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { logger } from '../bot'; 
+import { EmbedData, Book, SearchResult, Torrent, Interaction, Client } from '../interface/sendembed.interface';
 
+// Function to trim the description if it exceeds 4000 characters
 function trimDescription(description: string): string {
   const maxLength = 4000;
   if (description.length > maxLength) {
@@ -10,6 +12,7 @@ function trimDescription(description: string): string {
   return description;
 }
 
+// Function to trim the title if it exceeds 256 characters
 function trimTitle(title: string): string {
   const maxLength = 256;
   if (title.length > maxLength) {
@@ -19,13 +22,15 @@ function trimTitle(title: string): string {
   return title;
 }
 
+// Function to send an embed message with audiobook details
 export async function sendEmbed(
-  interaction: any, 
-  embedData: any, 
+  interaction: Interaction, 
+  embedData: EmbedData, 
   audiobookBayUrl: string, 
   index: number, 
-  searchResult: any
+  searchResult: SearchResult
 ) {
+  // Create the embed message
   const embed = new EmbedBuilder()
   .setTitle(trimTitle(embedData.title))
   .setURL(audiobookBayUrl+'/'+embedData.id)
@@ -39,29 +44,32 @@ export async function sendEmbed(
   .setImage(embedData.cover)
   .setFooter({text: 'Posted on '+embedData.posted});
 
-const buttonprev = new ButtonBuilder()
+  // Create the buttons for the message
+  const buttonprev = new ButtonBuilder()
   .setCustomId('button.prev')
   .setLabel('Prev')
   .setStyle(ButtonStyle.Primary);
 
-const buttonnext = new ButtonBuilder()
+  const buttonnext = new ButtonBuilder()
   .setCustomId('button.next')
   .setLabel('Next')
   .setStyle(ButtonStyle.Primary);
 
-const buttonmore = new ButtonBuilder()
+  const buttonmore = new ButtonBuilder()
   .setCustomId('button.moreinfo')
   .setLabel('Get More Info')
   .setStyle(ButtonStyle.Success);
 
-const buttonexit = new ButtonBuilder()
+  const buttonexit = new ButtonBuilder()
   .setCustomId('button.exit')
   .setLabel('Exit')
   .setStyle(ButtonStyle.Danger);
 
-const buttonRow = new ActionRowBuilder<ButtonBuilder>()
+  // Add the buttons to an action row
+  const buttonRow = new ActionRowBuilder<ButtonBuilder>()
   .addComponents(buttonprev, buttonmore, buttonnext, buttonexit);
 
+  // Edit the reply with the embed message and the buttons
   const message = await interaction.editReply({
     content: `Viewing Audiobook: ${index + 1} of ${searchResult.data.length}`,
     embeds: [embed],
@@ -72,12 +80,14 @@ const buttonRow = new ActionRowBuilder<ButtonBuilder>()
   return message;
 }
 
+// Similar functions for sending more info embed, download embed, download init embed, download complete DM, error embed, and disabling buttons follow...
+
   export async function sendmoreinfoEmbed(
-    interaction: any, 
-    book: any, 
+    interaction: Interaction, 
+    book: Book, 
     audiobookBayUrl: string, 
     index: number, 
-    searchResult: any
+    searchResult: SearchResult
   ) {
     // Replace empty strings with 'NA'
     book.lang = book.lang || 'NA';
@@ -121,9 +131,9 @@ const message = await interaction.editReply({
   }
 
   export async function senddownloadEmbed(
-    interaction: any,
+    interaction: Interaction,
     userId: string,
-    torrent: { name: string }
+    torrent: Torrent
   ) {
     const embed = new EmbedBuilder()
       .setTitle(`Order received!`)
@@ -140,9 +150,9 @@ const message = await interaction.editReply({
   }
 
   export async function senddownloadinitEmbed(
-    interaction: any,
+    interaction: Interaction,
     userId: string,
-    initialTorrent: { name: string }
+    initialTorrent: Torrent
   ) {
     const embed = new EmbedBuilder()
       .setTitle(`Order received!`)
@@ -159,9 +169,9 @@ const message = await interaction.editReply({
   }
 
   export async function senddownloadcompleteDM(
-    client: any,
+    client: Client,
     userId: string,
-    torrent: { name: string }
+    torrent: Torrent
   ) {
     const embed = new EmbedBuilder()
       .setTitle(`Enjoy your book!`)
@@ -178,7 +188,7 @@ const message = await interaction.editReply({
   }
 
   export async function senderrorEmbed(
-    interaction: any
+    interaction: Interaction
   ) {
     const embed = new EmbedBuilder()
       .setTitle(`Ohhhhh shit!`)
