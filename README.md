@@ -11,8 +11,14 @@ To utilize this bot you need:
 
 ## 🏁 Install
 
-```shh
-npm install audiobookbay
+```version: '3'
+services:
+  abb-discord-bot:
+    image: lakker/abb-discord-bot:latest
+    container_name: abb-discord-bot
+    volumes:
+      - ./example.env:/app/example.env
+      - ./logs:/app/logs
 ```
 
 ## 🔍 Search Commands
