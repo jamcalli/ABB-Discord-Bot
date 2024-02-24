@@ -11,6 +11,13 @@ To utilize this bot you need:
 
 ## 🏁 Install
 
+  1. mkdir /WHEREVER/YOU/WANT/
+  2. cd /WHEREVER/YOU/WANT/
+  3. nano docker-compose.yml
+  4. paste in the docker compose found below
+  5. cp example.env .env
+  6. nano .env and replace with all your variables.
+
 ```
 version: '3'
 services:
@@ -21,6 +28,7 @@ services:
       - ./example.env:/app/example.env
       - ./logs:/app/logs
 ```
+
 
 ## 🔍 Search Commands
 
