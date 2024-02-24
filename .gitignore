@@ -1,8 +1,5 @@
 node_modules
-dist
-docs/images
 .env
-pnpm-lock.yaml
-local-playground.test.ts
 _test_
 /logs/*
+.dockerignore
