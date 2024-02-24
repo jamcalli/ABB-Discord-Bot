@@ -4,7 +4,7 @@ import { Client, Collection } from "discord.js";
 import { initializeLogger } from './utils/logger';
 import { config } from "./config";
 import { deployCommands } from "./deploy-commands";
-import {  qbittorrent, downloadHandler } from "./utils/qbittorrent";
+import { qbittorrent, downloadHandler } from "./utils/qbittorrent";
 
 // Initialize logger
 export const logger = initializeLogger();
@@ -32,7 +32,15 @@ for (const folder of commandFolders) {
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'));
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
-        const command = require(filePath);
+        let command;
+        try {
+            command = require(filePath);
+        } catch (error) {
+            if (error instanceof Error) {
+                logger.error(`Failed to load command at ${filePath}: ${error.message}`);
+            }
+            continue;
+        }
         // Set a new item in the Collection with the key as the command name and the value as the exported module
         if ('data' in command && 'execute' in command) {
             client.commands.set(command.data.name, command);
@@ -48,7 +56,15 @@ const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.ts'
 
 for (const file of eventFiles) {
     const filePath = path.join(eventsPath, file);
-    const event = require(filePath);
+    let event: { once?: boolean, name: string, execute: Function };
+    try {
+        event = require(filePath);
+    } catch (error) {
+        if (error instanceof Error) {
+            logger.error(`Failed to load event at ${filePath}: ${error.message}`);
+        }
+        continue;
+    }
     if (event.once) {
         client.once(event.name, (...args) => event.execute(...args));
     } else {
@@ -57,5 +73,13 @@ for (const file of eventFiles) {
 }
 
 // Log in to the Discord client and deploy commands
-client.login(config.DISCORD_TOKEN);
-deployCommands();
+client.login(config.DISCORD_TOKEN).catch(error => {
+    if (error instanceof Error) {
+        logger.error(`Failed to login to Discord: ${error.message}`);
+    }
+});
+deployCommands().catch(error => {
+    if (error instanceof Error) {
+        logger.error(`Failed to deploy commands: ${error.message}`);
+    }
+});

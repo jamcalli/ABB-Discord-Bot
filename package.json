@@ -26,10 +26,11 @@
     "@types/node-fetch": "^2.6.2",
     "axios": "^1.6.7",
     "cheerio": "^1.0.0-rc.12",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.12.1",
     "dotenv": "^16.4.2",
     "node-fetch": "^3.2.10",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.0.1",
