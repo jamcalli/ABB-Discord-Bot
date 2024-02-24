@@ -5,97 +5,130 @@ import { sendEmbed, sendmoreinfoEmbed, disableButtons, senderrorEmbed, senddownl
 import { queueUserTorrent } from "../utils/qbittorrent";
 import { logger } from '../bot';
 import { InteractionCollector, ButtonInteraction } from 'discord.js';
+import { SearchResult, EmbedData, ExtendedBook } from '../interface/bookbrowser.interface';
 
+// The main function that handles the interaction with the book browser
 export function bookBrowser(
-    collector: InteractionCollector<ButtonInteraction>,
-    searchResult: SearchResult,
-  ) {
-    let index = 0;
-    let extendedBook: any | null = null; // replace 'any' with the actual type of extendedBook
-  
-    collector.on('collect', async (i: ButtonInteraction) => {
-      let embedData = searchResult.data[index];
-  
-      try {
-        logger.debug(`Processing interaction with customId: ${i.customId}`);
-        await i.deferUpdate();
+  collector: InteractionCollector<ButtonInteraction>, // The collector that collects button interactions
+  searchResult: SearchResult, // The search result data
+) {
+  let index = 0; // The current index in the search result data
+  let extendedBook: ExtendedBook | null = null; // The current extended book data
 
-        if (i.customId === 'button.exit') {
-          logger.debug('Exit button pressed');
-          await i.deleteReply();
-          collector.stop();
+  // When a button interaction is collected
+  collector.on('collect', async (i: ButtonInteraction) => {
+    let embedData: EmbedData = searchResult.data[index]; // The current embed data
+
+    try {
+      logger.debug(`Processing interaction with customId: ${i.customId}`);
+      await i.deferUpdate(); // Defer the update of the interaction
+
+      // If the exit button is pressed
+      if (i.customId === 'button.exit') {
+        logger.debug('Exit button pressed');
+        await i.deleteReply(); // Delete the reply
+        collector.stop(); // Stop the collector
+        return;
+      }
+
+      // If the next or previous button is pressed
+      if (i.customId === 'button.next' || i.customId === 'button.prev') {
+        index = handlePagination(i.customId, index, searchResult.data.length); // Handle the pagination
+        embedData = searchResult.data[index]; // Update the embed data
+        sendEmbed(i, embedData, audiobookBayUrl, index, searchResult); // Send the embed
+      } 
+      // If the download button is pressed
+      else if (i.customId === 'button.download') {
+        if (!extendedBook) {
+          logger.error('More info must be requested before downloading');
           return;
         }
-  
-        if (i.customId === 'button.next' || i.customId === 'button.prev') {
-          index = handlePagination(i.customId, index, searchResult.data.length);
-          embedData = searchResult.data[index];
-          sendEmbed(i, embedData, audiobookBayUrl, index, searchResult);
-        } else if (i.customId === 'button.download') {
-          handleDownload(i, extendedBook, collector);
-        } else if (i.customId === 'button.moreinfo') {
-            extendedBook = await handleMoreInfo(i, searchResult.data[index], index, searchResult);
-        } else if (i.customId === 'button.back' || i.customId === 'button.exit') {
-          embedData = searchResult.data[index];
-          sendEmbed(i, embedData, audiobookBayUrl, index, searchResult);
+        handleDownload(i, extendedBook, collector); // Handle the download
+      } 
+      // If the more info button is pressed
+      else if (i.customId === 'button.moreinfo') {
+        extendedBook = await handleMoreInfo(i, searchResult.data[index], index, searchResult); // Handle the more info request
+        if (!extendedBook) {
+          logger.error('Failed to get more info');
+          return;
         }
-      } catch (error) {
-        handleError(error);
+      } 
+      // If the back or exit button is pressed
+      else if (i.customId === 'button.back' || i.customId === 'button.exit') {
+        embedData = searchResult.data[index]; // Update the embed data
+        sendEmbed(i, embedData, audiobookBayUrl, index, searchResult); // Send the embed
       }
-    });
-  }
-  
-  function handlePagination(buttonId: string, index: number, length: number): number {
-    logger.debug(`Handling pagination: buttonId=${buttonId}, index=${index}, length=${length}`);
-    if (buttonId === 'button.next') {
-      index++;
-      if (index >= length) index = 0;
-    } else if (buttonId === 'button.prev') {
-      index--;
-      if (index < 0) index = length - 1;
+    } catch (error: unknown) {
+      // If the error is an instance of Error
+      if (error instanceof Error) {
+        handleError(error); // Handle the error
+      } else {
+        // If the error is not an instance of Error
+        logger.error(error);
+      }
     }
-    return index;
+  });
+} 
+
+// Function to handle the pagination
+function handlePagination(buttonId: string, index: number, length: number): number {
+  logger.debug(`Handling pagination: buttonId=${buttonId}, index=${index}, length=${length}`);
+  // If the next button is pressed
+  if (buttonId === 'button.next') {
+    index++; // Increment the index
+    if (index >= length) index = 0; // If the index is out of bounds, reset it to 0
+  } 
+  // If the previous button is pressed
+  else if (buttonId === 'button.prev') {
+    index--; // Decrement the index
+    if (index < 0) index = length - 1; // If the index is out of bounds, set it to the last element
   }
+  return index; // Return the updated index
+}
   
-  async function handleMoreInfo(i: ButtonInteraction, data: any, index: number, searchResult: any): Promise<any | null> {
-    // replace 'any' with the actual type of data
-    disableButtons(i);
-    const isSiteUp = await testSite();
-    if (isSiteUp) {
-      const id = data.id;
-      const book = await getAudiobook(id);
-      const extendedBook = {
-        ...book,
-        id: data.id,
-        posted: data.posted,
-        cover: data.cover
-      };
-      sendmoreinfoEmbed(i, extendedBook, audiobookBayUrl, index, searchResult);
-      return extendedBook;
-    } else {
-      logger.error('The site is down at getAudiobook. Cannot get the audiobook.');
-      senderrorEmbed(i);
-      return null;
-    }
+// Function to handle the more info request
+async function handleMoreInfo(i: ButtonInteraction, data: EmbedData, index: number, searchResult: SearchResult): Promise<ExtendedBook | null> {
+  disableButtons(i); // Disable the buttons
+  const isSiteUp = await testSite(); // Test if the site is up
+  if (isSiteUp) {
+    const id = data.id; // Get the id from the data
+    const book = await getAudiobook(id); // Get the audiobook data
+    const extendedBook = {
+      ...book, // Spread the book data
+      id: data.id, // Add the id from the data
+      posted: data.posted, // Add the posted date from the data
+      cover: data.cover // Add the cover from the data
+    };
+    sendmoreinfoEmbed(i, extendedBook, audiobookBayUrl, index, searchResult); // Send the more info embed
+    return extendedBook; // Return the extended book data
+  } else {
+    logger.error('The site is down at getAudiobook. Cannot get the audiobook.'); // Log the error
+    senderrorEmbed(i); // Send the error embed
+    return null; // Return null
   }
-  
-  function handleDownload(i: ButtonInteraction, extendedBook: any | null, collector: InteractionCollector<ButtonInteraction>) {
-    // replace 'any' with the actual type of extendedBook
-    if (!extendedBook) {
-      logger.error('More info must be requested before downloading');
-      return;
-    }
-    const userId = i.user.id;
-    const bookName = extendedBook.title;
-    const magnetUrl = extendedBook.torrent.magnetUrl;
-    senddownloadinitEmbed(i, userId, bookName);
-    queueUserTorrent(userId, bookName, i, magnetUrl);
-    collector.stop();
+}
+
+// Function to handle the download
+function handleDownload(i: ButtonInteraction, extendedBook: ExtendedBook | null, collector: InteractionCollector<ButtonInteraction>) {
+  if (!extendedBook) {
+    logger.error('More info must be requested before downloading'); // Log the error
+    return;
   }
-  
-  function handleError(error: any) {
-    // replace 'any' with the actual type of error
-    const discordError = error as any;
-    logger.error(`Error: ${discordError.message}`);
-    throw error;
+  const userId = i.user.id; // Get the user id
+  const bookName = extendedBook.title; // Get the book name
+  const magnetUrl = extendedBook.torrent.magnetUrl; // Get the magnet url
+  if (magnetUrl === undefined) {
+    logger.error('Magnet URL is undefined'); // Log the error
+    return;
   }
+  senddownloadinitEmbed(i, userId, { name: bookName }); // Send the download init embed
+  queueUserTorrent(userId, bookName, i, magnetUrl); // Queue the user torrent
+  collector.stop(); // Stop the collector
+}
+
+// Function to handle the error
+function handleError(error: Error) {
+  const discordError = error as Error; // Cast the error to an Error
+  logger.error(`Error: ${discordError.message}`); // Log the error message
+  throw error; // Throw the error
+}

@@ -12,7 +12,7 @@ import { QBittorrentConfig, Task, TorrentData, AllData, DownloadingData, ExecRes
 
 dotenv.config();
 
-const { PLEX_HOST, PLEX_TOKEN } = process.env;
+const { PLEX_HOST, PLEX_TOKEN, PLEX_LIBRARY_NUM } = process.env;
 
 // Fetching environment variables for QBittorrent configuration
 const QBITTORRENT_HOST = process.env.QBITTORRENT_HOST!;
@@ -160,7 +160,7 @@ const exec = promisify(execCb);
 async function runCurlCommand(): Promise<void> {
   try {
     // Execute the curl command and get the stdout and stderr
-    const { stdout, stderr }: ExecResult = await exec(`curl -s ${PLEX_HOST}library/sections/11/refresh?X-Plex-Token=${PLEX_TOKEN}`);
+    const { stdout, stderr }: ExecResult = await exec(`curl -s ${PLEX_HOST}library/sections/${PLEX_LIBRARY_NUM}/refresh?X-Plex-Token=${PLEX_TOKEN}`);
     
     // If there was an error, log it
     if (stderr) {

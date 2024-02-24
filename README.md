@@ -1,4 +1,13 @@
-# ✨🎧AudioBookBay Scraper🎧✨
+# ✨🤖AudioBook Bay Discord Bot🤖✨
+
+## Overview
+
+This discord bot serves a very niche function: to interactively scrape audiobooks from AudioBook Bay from within discord. 
+
+To utilize this bot you need:
+  1. To serve audiobooks to your Plex users
+  2. Use Qbitorrent to handle your downloads (I specifically use rdt-client with Debrid)
+  3. Use Discord
 
 ## 🏁 Install
 
@@ -6,7 +15,7 @@
 npm install audiobookbay
 ```
 
-## 🔍 Search Audiobooks
+## 🔍 Search Commands
 
 | Name      | Description            | Default                                               | Type   |
 | --------- | ---------------------- | ----------------------------------------------------- | ------ |
