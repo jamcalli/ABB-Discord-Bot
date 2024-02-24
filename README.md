@@ -11,7 +11,8 @@ To utilize this bot you need:
 
 ## 🏁 Install
 
-```version: '3'
+```
+version: '3'
 services:
   abb-discord-bot:
     image: lakker/abb-discord-bot:latest
