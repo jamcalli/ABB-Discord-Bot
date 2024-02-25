@@ -6,7 +6,7 @@
 
 This discord bot serves a very niche function: to interactively scrape audiobooks from AudioBook Bay from within discord. 
 
-[](./docs/images/abb-discord-demo.gif)
+![Demo GIF](./docs/images/abb-discord-demo.gif)
 
 To utilize this bot you need:
 1. To serve audiobooks via Plex (or not)
