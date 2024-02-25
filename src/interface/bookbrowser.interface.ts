@@ -3,9 +3,17 @@ export interface SearchResult {
 }
 
 export interface EmbedData {
+  title: string;
   id: string;
-  posted: string;
+  lang: string;
+  info: {
+    format: string;
+    unit: string;
+    size: string;
+    sizeUnit: string;
+  };
   cover: string;
+  posted: string;
 }
 
 export interface ExtendedBook extends EmbedData {

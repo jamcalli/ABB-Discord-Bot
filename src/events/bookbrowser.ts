@@ -97,7 +97,8 @@ async function handleMoreInfo(i: ButtonInteraction, data: EmbedData, index: numb
       ...book, // Spread the book data
       id: data.id, // Add the id from the data
       posted: data.posted, // Add the posted date from the data
-      cover: data.cover // Add the cover from the data
+      cover: data.cover, // Add the cover from the data
+      info: data.info, 
     };
     sendmoreinfoEmbed(i, extendedBook, audiobookBayUrl, index, searchResult); // Send the more info embed
     return extendedBook; // Return the extended book data
@@ -121,7 +122,7 @@ function handleDownload(i: ButtonInteraction, extendedBook: ExtendedBook | null,
     logger.error('Magnet URL is undefined'); // Log the error
     return;
   }
-  senddownloadinitEmbed(i, userId, { name: bookName }); // Send the download init embed
+  senddownloadinitEmbed(i, userId, bookName ); // Send the download init embed
   queueUserTorrent(userId, bookName, i, magnetUrl); // Queue the user torrent
   collector.stop(); // Stop the collector
 }

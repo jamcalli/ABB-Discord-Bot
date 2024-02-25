@@ -11,12 +11,37 @@ To utilize this bot you need:
 
 ## 🏁 Install
 
-  1. Create a directory of your choice (e.g. ./abb-discord-bot) to hold the docker-compose.yml and .env files
-  2. cd /WHEREVER/YOU/WANT/
-  3. nano docker-compose.yml
-  4. paste in the docker compose found below
-  5. cp example.env .env
-  6. nano .env and replace with all your variables.
+  1. Create a Discord Bot
+      a. send message embed links slash commands
+
+
+  2. Create a directory of your choice (e.g. ./abb-discord-bot) to hold the docker-compose.yml and .env files:
+
+```
+mkdir ./abb-discord-bot
+cd ./abb-discord-bot
+```
+
+  3. Download docker-compose.yml and example.env with the following commands:
+
+```
+wget https://github.com/jamcalli/ABB-Discord-Bot/releases/latest/download/docker-compose.yml
+wget -O .env https://github.com//jamcalli/ABB-Discord-Bot/releases/latest/download/example.env
+```
+  4. Populate the .env file with your parameters:
+
+```
+DISCORD_TOKEN=YOUR_DISCORD_TOKEN 
+DISCORD_CLIENT_ID=YOUR_DISCORD_CLIENT_ID # Taken when creating your discord bot.
+DISCORD_GUILD_ID=YOUR_DISCORD_GUILD_ID # The ID of the guild where your bot will live. 
+QBITTORRENT_HOST=YOUR_QBITTORRENT_HOST
+QBITTORRENT_USERNAME=YOUR_QBITTORRENT_USERNAME
+QBITTORRENT_PASSWORD=YOUR_QBITTORRENT_PASSWORD
+PLEX_HOST=YOUR_PLEX_HOST
+PLEX_TOKEN=YOUR_PLEX_TOKEN # This is your X-Plex-Token. Find out how to get yours [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/)
+PLEX_LIBRARY_NUM=YOUR_PLEX_LIBRARY_NUM
+```
+
 
 ```
 version: '3'

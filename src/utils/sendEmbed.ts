@@ -152,7 +152,7 @@ const message = await interaction.editReply({
   export async function senddownloadinitEmbed(
     interaction: Interaction,
     userId: string,
-    initialTorrent: Torrent
+    initialTorrent: string
   ) {
     const embed = new EmbedBuilder()
       .setTitle(`Order received!`)
