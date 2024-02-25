@@ -38,18 +38,31 @@ wget -O .env https://github.com//jamcalli/ABB-Discord-Bot/releases/latest/downlo
 ```
   4. Populate the .env file with your parameters:
 
-```
-DISCORD_TOKEN=YOUR_DISCORD_TOKEN # The token from above, when creating your discord bot.
-DISCORD_CLIENT_ID=YOUR_DISCORD_CLIENT_ID # Go to https://discord.com/developers/applications. Select your bot application. The applcation ID is on that page.
-DISCORD_GUILD_ID=YOUR_DISCORD_GUILD_ID # The ID of the guild where your bot will live. 
-QBITTORRENT_HOST=YOUR_QBITTORRENT_HOST 
+Set the following environment variables:
+
+- `DISCORD_TOKEN`: The token from above, when creating your discord bot.
+- `DISCORD_CLIENT_ID`: Go to [Discord Developer Applications](https://discord.com/developers/applications) to find your bot application's ID.
+- `DISCORD_GUILD_ID`: The ID of the guild where your bot will live.
+- `QBITTORRENT_HOST`: qBittorrent host address (e.g., http://localhost:6500)
+- `QBITTORRENT_USERNAME`: qBittorrent username
+- `QBITTORRENT_PASSWORD`: qBittorrent password
+- `PLEX_HOST`: Plex server address (e.g., http://localhost:32400)
+- `PLEX_TOKEN`: This is your X-Plex-Token. Find out how to get yours [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
+- `PLEX_LIBRARY_NUM`: This is the library section number. It can be found by going to the following URL: `http://[PMS_IP_Address]:32400/library/sections?X-Plex-Token=YourTokenGoesHere`. Replace `YourTokenGoesHere` with your token from above. Note the `key="number"` of your audiobook library. That number goes here.
+
+Your `.env` file should look something like this:
+
+```env
+DISCORD_TOKEN=YOUR_DISCORD_TOKEN
+DISCORD_CLIENT_ID=YOUR_DISCORD_CLIENT_ID
+DISCORD_GUILD_ID=YOUR_DISCORD_GUILD_ID
+QBITTORRENT_HOST=YOUR_QBITTORRENT_HOST
 QBITTORRENT_USERNAME=YOUR_QBITTORRENT_USERNAME
 QBITTORRENT_PASSWORD=YOUR_QBITTORRENT_PASSWORD
-PLEX_HOST=YOUR_PLEX_HOST # plex server address (eg. localhost:32400)
-PLEX_TOKEN=YOUR_PLEX_TOKEN # This is your X-Plex-Token. Find out how to get yours [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/)
-PLEX_LIBRARY_NUM=YOUR_PLEX_LIBRARY_NUM  # This is the library section number. It can be found by going to the following: http://[PMS_IP_Address]:32400/library/sections?X-Plex-Token=YourTokenGoesHere. Replace the token with your token from above. Note the key="number" of your audiobook library. That number goes here.
+PLEX_HOST=YOUR_PLEX_HOST
+PLEX_TOKEN=YOUR_PLEX_TOKEN
+PLEX_LIBRARY_NUM=YOUR_PLEX_LIBRARY_NUM
 ```
-
 
 ## 🔍 Search Commands
 
