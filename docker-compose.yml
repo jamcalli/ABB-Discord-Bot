@@ -1,0 +1,9 @@
+version: '3'
+services:
+  abb-discord-bot:
+    image: lakker/abb-discord-bot:latest
+    container_name: abb-discord-bot
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
