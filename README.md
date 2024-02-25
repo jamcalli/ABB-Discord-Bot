@@ -1,6 +1,6 @@
 # ✨🤖AudioBook Bay Discord Bot🤖✨
 
-*Disclaimer. This was a personal project to learn DiscordJS and TypeScript. Go easy one me. 
+*Disclaimer. This was a personal project to learn DiscordJS and TypeScript. Go easy on me. 
 
 ## Overview
 
