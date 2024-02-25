@@ -1,11 +1,15 @@
 # ✨🤖AudioBook Bay Discord Bot🤖✨
 
+*Disclaimer. This was a personal project to learn DiscordJS and TypeScript. Go easy one me. 
+
 ## Overview
 
 This discord bot serves a very niche function: to interactively scrape audiobooks from AudioBook Bay from within discord. 
 
+[](./docs/images/abb-discord-demo.gif)
+
 To utilize this bot you need:
-1. To serve audiobooks via Plex
+1. To serve audiobooks via Plex (or not)
 2. Use Qbitorrent to handle your downloads (I specifically use rdt-client with Debrid)
 3. Use Discord
 
@@ -46,6 +50,7 @@ Set the following environment variables:
 - `QBITTORRENT_HOST`: qBittorrent host address (e.g., http://localhost:6500)
 - `QBITTORRENT_USERNAME`: qBittorrent username
 - `QBITTORRENT_PASSWORD`: qBittorrent password
+- `USE_PLEX`: TRUE or FALSE (If not true, then you can leave the other plex variables blank)
 - `PLEX_HOST`: Plex server address (e.g., http://localhost:32400)
 - `PLEX_TOKEN`: This is your X-Plex-Token. Find out how to get yours [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
 - `PLEX_LIBRARY_NUM`: This is the library section number. It can be found by going to the following URL: `http://[PMS_IP_Address]:32400/library/sections?X-Plex-Token=YourTokenGoesHere`. Replace `YourTokenGoesHere` with your token from above. Note the `key="number"` of your audiobook library. That number goes here.
@@ -59,6 +64,7 @@ DISCORD_GUILD_ID=YOUR_DISCORD_GUILD_ID
 QBITTORRENT_HOST=YOUR_QBITTORRENT_HOST
 QBITTORRENT_USERNAME=YOUR_QBITTORRENT_USERNAME
 QBITTORRENT_PASSWORD=YOUR_QBITTORRENT_PASSWORD
+USE_PLEX=TRUE
 PLEX_HOST=YOUR_PLEX_HOST
 PLEX_TOKEN=YOUR_PLEX_TOKEN
 PLEX_LIBRARY_NUM=YOUR_PLEX_LIBRARY_NUM
