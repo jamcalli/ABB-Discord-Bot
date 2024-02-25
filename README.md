@@ -69,4 +69,10 @@ PLEX_HOST=YOUR_PLEX_HOST
 PLEX_TOKEN=YOUR_PLEX_TOKEN
 PLEX_LIBRARY_NUM=YOUR_PLEX_LIBRARY_NUM
 ```
-5. Lastly, use the command /scrape. The AudioBook Bay search query is very janky, so provide at least something to the title filter to narrow down your search results.
+5. `docker compose pull && docker compose up -d`
+
+If all was successful, your logs should look something like this:
+
+![Demo GIF](./docs/images/abb-discord-init-logs.JPG)
+
+6. Lastly, use the command /scrape. The AudioBook Bay search query is very janky, so provide at least something to the title filter to narrow down your search results.
