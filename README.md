@@ -5,13 +5,13 @@
 This discord bot serves a very niche function: to interactively scrape audiobooks from AudioBook Bay from within discord. 
 
 To utilize this bot you need:
-  1. To serve audiobooks to your Plex users
+  1. To serve audiobooks via Plex
   2. Use Qbitorrent to handle your downloads (I specifically use rdt-client with Debrid)
   3. Use Discord
 
 ## 🏁 Install
 
-  1. mkdir /WHEREVER/YOU/WANT/
+  1. Create a directory of your choice (e.g. ./abb-discord-bot) to hold the docker-compose.yml and .env files
   2. cd /WHEREVER/YOU/WANT/
   3. nano docker-compose.yml
   4. paste in the docker compose found below
@@ -24,8 +24,9 @@ services:
   abb-discord-bot:
     image: lakker/abb-discord-bot:latest
     container_name: abb-discord-bot
+    env_file:
+      - .env
     volumes:
-      - ./example.env:/app/example.env
       - ./logs:/app/logs
 ```
 
