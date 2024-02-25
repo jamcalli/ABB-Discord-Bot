@@ -5,3 +5,4 @@ _test_
 /logs/*
 .dockerignore
 .git
+dockerbuild.sh
