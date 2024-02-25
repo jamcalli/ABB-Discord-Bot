@@ -51,7 +51,8 @@ export const qbittorrent = new QBittorrent(config);
 export async function downloadMagnet(magnet: string) {
   try {
      // Attempting to add the magnet link to QBittorrent
-     await qbittorrent.addMagnet(magnet);
+     //await qbittorrent.addMagnet(magnet); 
+     await qbittorrent.normalizedAddTorrent(magnet, {label: 'Audiobooks',}); 
   } catch (error) {
     // Checking if the error is a known "sticky magnet" error
     if (error instanceof Error && error.message.includes('torrents/add": <no response>')) {
