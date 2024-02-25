@@ -76,3 +76,11 @@ If all was successful, your logs should look something like this:
 ![Demo GIF](./docs/images/abb-discord-init-logs.JPG)
 
 6. Lastly, use the command /scrape. The AudioBook Bay search query is very janky, so provide at least something to the title filter to narrow down your search results.
+
+## 🙏 Acknowledgements
+
+This project was made possible thanks to the following repositories:
+
+- [AudioBookBay Scraper](https://github.com/licavalentin/audiobookbay): This repository provided the basic functions that this bot relies upon.
+
+Please visit these repositories and give them a star if you found them helpful.
