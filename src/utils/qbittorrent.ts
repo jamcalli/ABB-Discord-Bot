@@ -6,23 +6,35 @@ import { ButtonInteraction } from 'discord.js';
 import { senddownloadEmbed, senddownloadcompleteDM } from './sendEmbed';
 import { promisify } from 'util';
 import { Client } from 'discord.js';
-import fs from 'fs';
-import path from 'path';
+//import fs from 'fs';
+//import path from 'path';
 import { QBittorrentConfig, Task, TorrentData, AllData, DownloadingData, ExecResult } from '../interface/qbittorrent.interface';
 
 dotenv.config();
-
-const { PLEX_HOST, PLEX_TOKEN, PLEX_LIBRARY_NUM } = process.env;
 
 // Fetching environment variables for QBittorrent configuration
 const QBITTORRENT_HOST = process.env.QBITTORRENT_HOST!;
 const QBITTORRENT_USERNAME = process.env.QBITTORRENT_USERNAME!;
 const QBITTORRENT_PASSWORD = process.env.QBITTORRENT_PASSWORD!;
+const USE_PLEX = process.env.USE_PLEX;
 
 // Checking if the required environment variables are defined
 if (!QBITTORRENT_HOST || !QBITTORRENT_USERNAME || !QBITTORRENT_PASSWORD) {
   // Logging an error message if any of the required environment variables are not defined
   logger.error('Environment variables QBITTORRENT_HOST, QBITTORRENT_USERNAME, or QBITTORRENT_PASSWORD are not defined');
+}
+
+let PLEX_HOST: string | undefined, PLEX_TOKEN: string | undefined, PLEX_LIBRARY_NUM: string | undefined;
+
+// If USE_PLEX is set to 'true', fetch and check for the other PLEX related environment variables
+if (USE_PLEX === 'TRUE') {
+  PLEX_HOST = process.env.PLEX_HOST;
+  PLEX_TOKEN = process.env.PLEX_TOKEN;
+  PLEX_LIBRARY_NUM = process.env.PLEX_LIBRARY_NUM;
+
+  if (!PLEX_HOST || !PLEX_TOKEN || !PLEX_LIBRARY_NUM) {
+    logger.error('Environment variables PLEX_HOST, PLEX_TOKEN, or PLEX_LIBRARY_NUM are not defined');
+  }
 }
 
 // Creating a configuration object for QBittorrent
@@ -225,7 +237,9 @@ export async function downloadHandler(client: Client, qbittorrent: QBittorrent):
         if (!previousTorrent || previousTorrent.state === 'downloading') {
           // Log a message, run the curl command, remove the torrent from qbittorrent, and log the result
           logger.info(`AudioBook: ${torrent.name} is complete. Removing from client.`);
-          await runCurlCommand();
+          if (USE_PLEX === 'TRUE' && PLEX_HOST && PLEX_TOKEN && PLEX_LIBRARY_NUM) {
+            await runCurlCommand();
+          }
           const result = await qbittorrent.removeTorrent(torrent.id, false);
           logger.info(`Removal result for ${torrent.name}: ${result}`);
 
@@ -235,7 +249,7 @@ export async function downloadHandler(client: Client, qbittorrent: QBittorrent):
             const userData: DownloadingData = isDownloading.get(torrent.id)!;
             // Only send the DM if the torrent has just finished downloading
             if (!previousTorrent || previousTorrent.state === 'downloading') {
-              await senddownloadcompleteDM(client, userData.userId, { name: userData.bookName });
+              await senddownloadcompleteDM(client, userData.userId, { name: userData.bookName }, USE_PLEX);
             }
             isDownloading.delete(torrent.id);
             logger.info('Number of items Downloading: ' + isDownloading.size);

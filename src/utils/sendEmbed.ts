@@ -171,7 +171,8 @@ const message = await interaction.editReply({
   export async function senddownloadcompleteDM(
     client: Client,
     userId: string,
-    torrent: Torrent
+    torrent: Torrent,
+    USE_PLEX: string | undefined
   ) {
     const embed = new EmbedBuilder()
       .setTitle(`Enjoy your book!`)
@@ -179,10 +180,14 @@ const message = await interaction.editReply({
       .setImage('https://i.imgur.com/ibmpIeR.png')
       .setFooter({text: 'Thank you for using AudioBook Bay Discord Bot!'});
   
-      const user = await client.users.fetch(userId);
-
+    const user = await client.users.fetch(userId);
+  
+    const content = USE_PLEX === 'TRUE'
+      ? `The AudioBook ${torrent.name} has completed downloading. Check Plex for the new content.`
+      : `The AudioBook ${torrent.name} has completed downloading. Check your content library for the new content.`;
+  
     await user.send({
-      content: `The AudioBook ${torrent.name} has completed downloading. Check Plex for the new content.`,
+      content: content,
       embeds: [embed],
     });
   }
