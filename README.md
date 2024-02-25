@@ -23,7 +23,7 @@ To utilize this bot you need:
    - Under Add to Server select your server.
    - Authorize the permissions.
    - Go back to the Discord Developer Portal and go to the Bot page and click Add Bot
-   - Turn on Message Content Intent.
+   - Turn on Message Content Intent under the heading `Privileged Gateway Intents`.
    - Save the changes.
    - Then copy the Token. You will need to provide this token in your .env file.
 
@@ -46,7 +46,7 @@ Set the following environment variables:
 
 - `DISCORD_TOKEN`: The token from above, when creating your discord bot.
 - `DISCORD_CLIENT_ID`: Go to [Discord Developer Applications](https://discord.com/developers/applications) to find your bot application's ID.
-- `DISCORD_GUILD_ID`: The ID of the guild where your bot will live.
+- `DISCORD_GUILD_ID`: The [ID of the guild](https://en.wikipedia.org/wiki/Template:Discord_channel#:~:text=To%20get%20the%20channel%2Fserver,to%20get%20the%20guild%20ID.) where your bot will live.
 - `QBITTORRENT_HOST`: qBittorrent host address (e.g., http://localhost:6500)
 - `QBITTORRENT_USERNAME`: qBittorrent username
 - `QBITTORRENT_PASSWORD`: qBittorrent password
@@ -69,3 +69,4 @@ PLEX_HOST=YOUR_PLEX_HOST
 PLEX_TOKEN=YOUR_PLEX_TOKEN
 PLEX_LIBRARY_NUM=YOUR_PLEX_LIBRARY_NUM
 ```
+5. Lastly, use the command /scrape. The AudioBook Bay search query is very janky, so provide at least something to the title filter to narrow down your search results.
