@@ -27,7 +27,7 @@ To utilize this bot you need:
 
 ```shell
 mkdir ./abb-discord-bot
-cd ./abb-discord-bot
+cd ./abb-discord-bot 
 ```
 
   3. Download docker-compose.yml and example.env with the following commands:
