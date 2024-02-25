@@ -37,8 +37,8 @@ cd ./abb-discord-bot
   3. Download docker-compose.yml and example.env with the following commands:
 
 ```
-wget https://github.com/jamcalli/ABB-Discord-Bot/releases/download/latest/docker-compose.yml
-wget -O .env https://github.com/jamcalli/ABB-Discord-Bot/releases/download/latest/example.env
+wget https://github.com/jamcalli/ABB-Discord-Bot/releases/download/Release/docker-compose.yml
+wget -O .env https://github.com/jamcalli/ABB-Discord-Bot/releases/download/Release/example.env
 ```
   4. Populate the .env file with your parameters:
 
