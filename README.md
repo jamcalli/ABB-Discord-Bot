@@ -12,7 +12,17 @@ To utilize this bot you need:
 ## 🏁 Install
 
   1. Create a Discord Bot
-      a. send message embed links slash commands
+      a.  Go to https://discord.com/developers/applications
+      b.  Create a new application (you can name it whatever, but AudiobookRequester is nice.) Feel free to use this icon: ![](./docs/images/ABB-Discord.png)
+      c.  Go to OAuth2 > URL Generator page, select bot under Scopes. Then, at minimum, select Embed Links, Use Slash Commands, and Send Messages under Bot Permissions.
+      d.  Click Copy to get the URL and go to that URL.
+      e.  Under Add to Server select your server.
+      f.  Authorize the permissions.
+      g.  Go back to the Discord Developer Portal and go to the Bot page and click Add Bot
+      h.  Turn on Message Content Intent.
+      i.  Save the changes.
+      j.  Then copy the Token. You will need to provide this token in your .env file.
+
 
 
   2. Create a directory of your choice (e.g. ./abb-discord-bot) to hold the docker-compose.yml and .env files:
