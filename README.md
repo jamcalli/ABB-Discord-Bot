@@ -10,7 +10,7 @@ This discord bot serves a very niche function: to interactively scrape audiobook
 
 To utilize this bot you need:
 1. To serve audiobooks via Plex (entirely optional)
-2. Use Qbitorrent to handle your downloads (I specifically use rdt-client with Debrid)
+2. Use Qbitorrent to handle your downloads
 3. Use Discord
 
 ## 🏁 Install
