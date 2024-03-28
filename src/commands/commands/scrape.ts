@@ -65,6 +65,12 @@ logger.info(`${'Order Received!'} - ${`Scraping results for - ${searchAuthor}${t
 const maxPages = 5;
 let currentPage = 0;
 
+// Define a function to delay execution. Prevents banning while scraping
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Search for audio books
 // Search for audio books
 while (currentPage < searchResult.pagination.totalPages && currentPage < maxPages) {
   currentPage += 1;
@@ -89,6 +95,9 @@ while (currentPage < searchResult.pagination.totalPages && currentPage < maxPage
       logger.error(`Search error: ${error}`);
     }
   }
+
+  // Add a delay between each page request
+  await delay(1000);  // Delay of 1 second
 }
 
 // Apply additional filtering
