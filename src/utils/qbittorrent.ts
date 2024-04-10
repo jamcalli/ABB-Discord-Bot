@@ -1,13 +1,10 @@
-import { logger } from '../bot'; 
+import { logger } from '../bot.ts'; 
 import { QBittorrent } from '@ctrl/qbittorrent';
 import dotenv from "dotenv";
 import { exec as execCb } from 'child_process';
-import { ButtonInteraction } from 'discord.js';
-import { senddownloadEmbed, senddownloadcompleteDM } from './sendEmbed';
+import { Client, ButtonInteraction } from 'discord.js';
+import { senddownloadEmbed, senddownloadcompleteDM } from './sendEmbed.ts';
 import { promisify } from 'util';
-import { Client } from 'discord.js';
-//import fs from 'fs';
-//import path from 'path';
 import { QBittorrentConfig, Task, TorrentData, AllData, DownloadingData, ExecResult } from '../interface/qbittorrent.interface';
 
 dotenv.config();

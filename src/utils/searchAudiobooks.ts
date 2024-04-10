@@ -1,8 +1,7 @@
 import cheerio from "cheerio";
 import fetch from "node-fetch";
-import { audiobookBayUrl } from "../constants";
+import { audiobookBayUrl } from "../constants.ts";
 import { Audiobook, AudioBookSearchResult, Pagination } from "../interface/search.interface";
-import { logger } from '../bot';
 
 /**
  * Search Audiobooks

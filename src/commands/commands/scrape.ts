@@ -1,12 +1,12 @@
-import { CommandInteraction, SlashCommandBuilder, ButtonInteraction, Collection, MessageComponentInteraction } from "discord.js";
+import { CommandInteraction, SlashCommandBuilder, ButtonInteraction } from "discord.js";
 import { AudioBookSearchResult } from "../../interface/search.interface";
-import { search } from "../../index";
-import { testSite } from "../../utils/siteTest";
-import { audiobookBayUrl } from "../../constants";
-import { sendEmbed, senderrorEmbed } from "../../utils/sendEmbed";
-import { fixCoverUrls, trimSearchResults } from "../../utils/validation";
-import { logger } from '../../bot';
-import { bookBrowser } from "../../events/bookbrowser";
+import { search } from "../../functionIndex.ts";
+import { testSite } from "../../utils/siteTest.ts";
+import { audiobookBayUrl } from "../../constants.ts";
+import { sendEmbed, senderrorEmbed } from "../../utils/sendEmbed.ts";
+import { fixCoverUrls, trimSearchResults } from "../../utils/validation.ts";
+import { logger } from '../../bot.ts';
+import { bookBrowser } from "../../events/bookbrowser.ts";
 import { SearchResultItem } from "../../interface/scrape.interface";
 
 // Define the command data 

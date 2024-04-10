@@ -1,5 +1,5 @@
 import { Events, CommandInteraction } from "discord.js";
-import { logger } from '../bot';
+import { logger } from '../bot.ts';
 
 // The name of the event
 const name = Events.InteractionCreate;

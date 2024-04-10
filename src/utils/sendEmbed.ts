@@ -1,5 +1,5 @@
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { logger } from '../bot'; 
+import { logger } from '../bot.ts'; 
 import { EmbedData, Book, SearchResult, Torrent, Interaction, Client } from '../interface/sendembed.interface';
 
 // Function to trim the description if it exceeds 4000 characters

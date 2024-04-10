@@ -4,3 +4,6 @@ _test_
 /logs/*
 .dockerignore
 dockerbuild.sh
+# Ignore JavaScript files
+/dist
+.swc

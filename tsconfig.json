@@ -1,26 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "CommonJS",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "strict": true,
-    "moduleResolution": "node",
-    "outDir": "dist",
-    "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "types": [
-      "vitest/globals"
-    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "outDir": "dist",
+    "lib": ["esnext"],
+    "types": ["node"],
+    "baseUrl": "./"
   },
-  
-  "include": [
-    "src"
-  ],
-  
-  "exclude": [
-    "node_modules" 
-  ]
-} 
+  "exclude": ["node_modules"],
+  "include": ["src/**/*.ts"]
+}

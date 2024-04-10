@@ -1,9 +1,9 @@
-import { getAudiobook } from "../utils/getAudiobook";
-import { testSite } from "../utils/siteTest";
-import { audiobookBayUrl } from "../constants";
-import { sendEmbed, sendmoreinfoEmbed, disableButtons, senderrorEmbed, senddownloadinitEmbed } from "../utils/sendEmbed";
-import { queueUserTorrent } from "../utils/qbittorrent";
-import { logger } from '../bot';
+import { getAudiobook } from "../utils/getAudiobook.ts";
+import { testSite } from "../utils/siteTest.ts";
+import { audiobookBayUrl } from "../constants.ts";
+import { sendEmbed, sendmoreinfoEmbed, disableButtons, senderrorEmbed, senddownloadinitEmbed } from "../utils/sendEmbed.ts";
+import { queueUserTorrent } from "../utils/qbittorrent.ts";
+import { logger } from '../bot.ts';
 import { InteractionCollector, ButtonInteraction } from 'discord.js';
 import { SearchResult, EmbedData, ExtendedBook } from '../interface/bookbrowser.interface';
 

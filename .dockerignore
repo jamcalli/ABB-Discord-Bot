@@ -6,3 +6,5 @@ _test_
 .dockerignore
 .git
 dockerbuild.sh
+/dist
+.swc

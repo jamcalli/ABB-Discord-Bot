@@ -1,11 +1,11 @@
 import { URLSearchParams } from "url";
-import { audiobookBayUrl } from "./constants";
-import { AudiobookDetails } from "./interface/audiobookDetails.interface";
-import { logger } from './bot';
-import { Categories, Tags } from "./interface/explore";
-import { AudioBookSearchResult, SearchIn } from "./interface/search.interface";
-import { getAudiobook } from "./utils/getAudiobook";
-import { searchAudiobooks } from "./utils/searchAudiobooks";
+import { audiobookBayUrl } from "./constants.ts";
+import { AudiobookDetails } from "./interface/audiobookDetails.interface.ts";
+import { logger } from './bot.ts';
+import { Categories, Tags } from "./interface/explore.ts";
+import { AudioBookSearchResult, SearchIn } from "./interface/search.interface.ts";
+import { getAudiobook } from "./utils/getAudiobook.ts";
+import { searchAudiobooks } from "./utils/searchAudiobooks.ts";
 
 /**
  * Search Audiobooks

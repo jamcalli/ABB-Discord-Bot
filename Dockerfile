@@ -13,5 +13,8 @@ RUN npm install
 # Copy the rest of the application code into the container
 COPY . .
 
+# Compile TypeScript to JavaScript
+RUN npm run build
+
 # Define the command to run the application
-CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "start" ]

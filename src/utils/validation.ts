@@ -1,4 +1,4 @@
-import { logger } from '../bot'; 
+import { logger } from '../bot.ts'; 
 import { AudioBookSearchResult, Audiobook } from "../interface/search.interface";
 
 /**

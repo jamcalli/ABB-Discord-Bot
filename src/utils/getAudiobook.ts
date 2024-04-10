@@ -1,9 +1,9 @@
 import cheerio from "cheerio";
 import fetch from "node-fetch";
-import { audiobookBayUrl } from "../constants";
+import { audiobookBayUrl } from "../constants.ts";
 
 import { AudiobookDetails } from "../interface/audiobookDetails.interface";
-import { generateMagnetUrl } from "./generateMagnetUrl";
+import { generateMagnetUrl } from "./generateMagnetUrl.ts";
 
 
 

@@ -1,8 +1,9 @@
 {
+  "type": "module",
   "name": "audiobookbay-discord-bot",
   "version": "2.0.6",
   "description": "AudioBookBay Scraper TypeScript DiscordBot",
-  "main": "src/bot.ts",
+  "main": "dist/src/bot.js",
   "keywords": [
     "audiobookbay",
     "audiobook",
@@ -11,10 +12,13 @@
   ],
   "scripts": {
     "example": "tsx ./playground/usage-example.ts",
-    "dev": "tsx watch src/bot.ts",
-    "deploy": "tsx src/deploy-commands.ts"
+    "dev": "cross-env NODE_ENV=development tsx watch src/bot.ts",
+    "deploy": "tsx src/deploy-commands.ts",
+    "build": "rm -rf dist && npx swc src -d dist",
+    "start": "node .",
+    "build:ci": "tsc && npm run build"
   },
-  "author": "Jayman McAllister",
+  "author": "jamcalli",
   "license": "GNU",
   "repository": {
     "type": "git",
@@ -33,11 +37,16 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@swc/cli": "^0.3.12",
+    "@swc/core": "^1.4.13",
+    "@swc/plugin-transform-imports": "^1.5.123",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
+    "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
     "picocolors": "^1.0.0",
     "tsx": "^4.7.1",
+    "typescript": "^4.5.4",
     "vitest": "^0.22.1"
   }
 }

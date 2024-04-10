@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { audiobookBayUrl } from "../constants";
-import { logger } from '../bot'; 
+import { audiobookBayUrl } from "../constants.ts";
+import { logger } from '../bot.ts'; 
 
 /**
  * Function to test if the site is up or down.
