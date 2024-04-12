@@ -1,1 +1,1 @@
-export const audiobookBayUrl = "http://theaudiobookbay.se";
+export const audiobookBayUrl = "https://audiobookbay.lu";

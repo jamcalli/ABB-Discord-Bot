@@ -97,7 +97,7 @@ while (currentPage < searchResult.pagination.totalPages && currentPage < maxPage
   }
 
   // Add a delay between each page request
-  await delay(0);  // Delay of 1 second
+  await delay(1000);  // Delay of 1 second
 }
 
 // Apply additional filtering
