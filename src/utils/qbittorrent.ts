@@ -259,7 +259,7 @@ export async function downloadHandler(client: Client, qbittorrent: QBittorrent):
           }
         }
         // If the torrent is downloading and it's a new download
-        else if (!previousTorrent || previousTorrent.state !== 'downloading') {
+        else if (!previousTorrent || (previousTorrent && previousTorrent.state !== 'downloading')) {
           // If the torrent is in the isDownloading map
           if (isDownloading.has(torrent.id)) {
             // Get the user data, log a message, send a download embed, and log the number of items in the map
