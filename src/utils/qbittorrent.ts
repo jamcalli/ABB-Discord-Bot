@@ -48,8 +48,7 @@ export const qbittorrent = new QBittorrent(config);
 export async function downloadMagnet(magnet: string) {
   try {
      // Attempting to add the magnet link to QBittorrent
-     //await qbittorrent.addMagnet(magnet); 
-     await qbittorrent.normalizedAddTorrent(magnet, {label: 'audiobooks',}); 
+     await qbittorrent.addMagnet(magnet); 
   } catch (error) {
     // Checking if the error is a known "sticky magnet" error
     if (error instanceof Error && error.message.includes('torrents/add": <no response>')) {
@@ -59,7 +58,7 @@ export async function downloadMagnet(magnet: string) {
       // If the error is not a known "sticky magnet" error, rethrowing it
       throw error; 
     }
-  }
+  } 
 }
 
 // Class to manage a queue of tasks
@@ -132,6 +131,7 @@ export function queueUserTorrent(userId: string, bookName: string, i: ButtonInte
       while (true) {
         // Get the updated data from qbittorrent
         allData = await qbittorrent.getAllData();
+
         // If a new torrent has appeared, break the loop
         if (allData.torrents.length > previousTorrents.length) {
           break;
@@ -209,51 +209,55 @@ export async function downloadHandler(client: Client, qbittorrent: QBittorrent):
     try {
       // Get all the data from qbittorrent
       const allData: AllData = await qbittorrent.getAllData();
+
       // Get the torrents from the data
       const torrents: TorrentData[] = allData.torrents;
-
-      // If there are no torrents, log a message and set the wasQueueEmpty flag to true
-      if (torrents.length === 0) {
+  
+      // Filter out torrents that were not added by this application
+      const relevantTorrents = torrents.filter(torrent => isDownloading.has(torrent.id));
+  
+      // If there are no relevant torrents, log a message and set the wasQueueEmpty flag to true
+      if (relevantTorrents.length === 0) {
         if (!wasQueueEmpty) {
           logger.info('No torrents in the queue. Waiting for new torrents.');
         }
         wasQueueEmpty = true;
         return;
       }
-
-      // If there are torrents, set the wasQueueEmpty flag to false
+  
+      // If there are relevant torrents, set the wasQueueEmpty flag to false
       wasQueueEmpty = false;
-
-      // Create a promise for each torrent
-      const promises = torrents.map(async (torrent) => {
+  
+      // Create a promise for each relevant torrent
+      const promises = relevantTorrents.map(async (torrent) => {
         // Find the torrent in the previous torrents array
         const previousTorrent = previousTorrents.find(t => t.id === torrent.id);
-
-      // If the torrent is not downloading
-      if (torrent.state !== 'downloading') {
-        // If the torrent was not in the previous torrents array or it was downloading
-        if (!previousTorrent || previousTorrent.state === 'downloading') {
-          // Log a message, run the curl command, remove the torrent from qbittorrent, and log the result
-          logger.info(`AudioBook: ${torrent.name} is complete. Removing from client.`);
-          if (USE_PLEX === 'TRUE' && PLEX_HOST && PLEX_TOKEN && PLEX_LIBRARY_NUM) {
-            await runCurlCommand();
-          }
-          const result = await qbittorrent.removeTorrent(torrent.id, false);
-          logger.info(`Removal result for ${torrent.name}: ${result}`);
-
-          // If the torrent is in the isDownloading map
-          if (isDownloading.has(torrent.id)) {
-            // Get the user data, send a download complete DM, remove the torrent from the isDownloading map, and log the number of items in the map
-            const userData: DownloadingData = isDownloading.get(torrent.id)!;
-            // Only send the DM if the torrent has just finished downloading
-            if (!previousTorrent || previousTorrent.state === 'downloading') {
-              await senddownloadcompleteDM(client, userData.userId, { name: userData.bookName }, USE_PLEX);
+  
+        // If the torrent is not downloading
+        if (torrent.state === 'seeding') {
+          // If the torrent was not in the previous torrents array or it was downloading
+          if (!previousTorrent || previousTorrent.state !== 'seeding') {
+            // Log a message, run the curl command, remove the torrent from qbittorrent, and log the result
+            logger.info(`AudioBook: ${torrent.name} is complete. Removing from client.`);
+            if (USE_PLEX === 'TRUE' && PLEX_HOST && PLEX_TOKEN && PLEX_LIBRARY_NUM) {
+              await runCurlCommand();
             }
-            isDownloading.delete(torrent.id);
-            logger.info('Number of items Downloading: ' + isDownloading.size);
+            const result = await qbittorrent.removeTorrent(torrent.id, false);
+            logger.info(`Removal result for ${torrent.name}: ${result}`);
+  
+            // If the torrent is in the isDownloading map
+            if (isDownloading.has(torrent.id)) {
+              // Get the user data, send a download complete DM, remove the torrent from the isDownloading map, and log the number of items in the map
+              const userData: DownloadingData = isDownloading.get(torrent.id)!;
+              // Only send the DM if the torrent has just finished downloading
+              if (!previousTorrent || previousTorrent.state !== 'seeding') {
+                await senddownloadcompleteDM(client, userData.userId, { name: userData.bookName }, USE_PLEX);
+              }
+              isDownloading.delete(torrent.id);
+              logger.info('Number of items Downloading: ' + isDownloading.size);
+            } 
           }
         }
-      }
         // If the torrent is downloading and it's a new download
         else if (!previousTorrent || previousTorrent.state !== 'downloading') {
           // If the torrent is in the isDownloading map
@@ -266,12 +270,12 @@ export async function downloadHandler(client: Client, qbittorrent: QBittorrent):
           }
         }
       });
-
+  
       // Wait for all the promises to resolve
       await Promise.all(promises);
       // Update the previous torrents array
-      previousTorrents = torrents;
-
+      previousTorrents = relevantTorrents;
+  
       // Save the cache after each check
       //saveCache(isDownloading);
     } catch (error) {
