@@ -25,6 +25,7 @@ export interface DownloadingData {
     userId: string;
     bookName: string;
     i: ButtonInteraction;
+    embedSent: boolean;
 }
 
 export interface ExecResult {

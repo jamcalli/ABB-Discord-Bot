@@ -146,7 +146,7 @@ export function queueUserTorrent(userId: string, bookName: string, i: ButtonInte
 
       // If a new torrent was found, add it to the isDownloading map
       if (newTorrent) {
-        const userData: DownloadingData = { userId, bookName, i };
+        const userData: DownloadingData = { userId, bookName, i, embedSent: false};
         isDownloading.set(newTorrent.id, userData);
       } else {
         // If no new torrent was found, log a message
@@ -155,7 +155,7 @@ export function queueUserTorrent(userId: string, bookName: string, i: ButtonInte
       // Log the number of items in the isDownloading map
       logger.debug('Number of items Downloading map: ' + isDownloading.size);
       // Send a download embed
-      senddownloadEmbed(i, userId, { name: bookName });
+      //senddownloadEmbed(i, userId, { name: bookName });
     } catch (error) {
       // If an error occurred, log it
       logger.error(`Error in queueUserTorrent: ${(error as Error).message}, Stack: ${(error as Error).stack}`);
@@ -265,7 +265,10 @@ export async function downloadHandler(client: Client, qbittorrent: QBittorrent):
             // Get the user data, log a message, send a download embed, and log the number of items in the map
             const userData = isDownloading.get(torrent.id)!;
             logger.info(`Audiobook: ${userData.bookName} is downloading.`);
-            senddownloadEmbed(userData.i, userData.userId, { name: userData.bookName });
+            if (!userData.embedSent) {
+              senddownloadEmbed(userData.i, userData.userId, { name: userData.bookName });
+              userData.embedSent = true;
+            }
             logger.info('Number of items Downloading: ' + isDownloading.size);
           }
         }
