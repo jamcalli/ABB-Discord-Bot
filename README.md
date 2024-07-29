@@ -54,6 +54,7 @@ Set the following environment variables:
 - `PLEX_HOST`: Plex server address (e.g., http://localhost:32400)
 - `PLEX_TOKEN`: This is your X-Plex-Token. Find out how to get yours [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
 - `PLEX_LIBRARY_NUM`: This is the library section number. It can be found by going to the following URL: `http://[PMS_IP_Address]:32400/library/sections?X-Plex-Token=YourTokenGoesHere`. Replace `YourTokenGoesHere` with your token from above. Note the `key="number"` of your audiobook library. That number goes here.
+- `AUDIOBOOK_BAY_URL`: Different regions have different base urls. See which one works for you and enter it here (eg. https://audiobookbay.lu).
 
 Your `.env` file should look something like this:
 
@@ -68,6 +69,7 @@ USE_PLEX=TRUE
 PLEX_HOST=YOUR_PLEX_HOST
 PLEX_TOKEN=YOUR_PLEX_TOKEN
 PLEX_LIBRARY_NUM=YOUR_PLEX_LIBRARY_NUM
+AUDIOBOOK_BAY_URL=WORKING_ABB_URL
 ```
 5. `docker compose pull && docker compose up -d`
 
