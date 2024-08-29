@@ -6,10 +6,10 @@ This discord bot serves a very niche function: to interactively scrape audiobook
 
 ![Demo GIF](./docs/images/abb-discord-demo.gif)
 
-To utilize this bot you need:
+This bot allows you to:
 1. To serve audiobooks via Plex (entirely optional)
-2. Use Qbitorrent to handle your downloads
-3. Use Discord
+2. Use Qbitorrent to handle your downloads.
+3. Use Discord for Searching ABB.
 
 ## 🏁 Install
 
@@ -45,7 +45,7 @@ Set the following environment variables:
 - `DISCORD_TOKEN`: The token from above, when creating your discord bot.
 - `DISCORD_CLIENT_ID`: Go to [Discord Developer Applications](https://discord.com/developers/applications) to find your bot application's ID.
 - `DISCORD_GUILD_ID`: The [ID of the guild](https://en.wikipedia.org/wiki/Template:Discord_channel#:~:text=To%20get%20the%20channel%2Fserver,to%20get%20the%20guild%20ID.) where your bot will live.
-- `QBITTORRENT_HOST`: qBittorrent host address (e.g., http://localhost:6500). All downloads are categorized as `audiobooks` (within a folder called Audiobooks within your qBittorent download folders. Point Plex at this directory or ensure those files are auto moved to wherever your Plex looks for Audiobooks).
+- `QBITTORRENT_HOST`: qBittorrent host address (e.g., http://localhost:6500).
 - `QBITTORRENT_USERNAME`: qBittorrent username
 - `QBITTORRENT_PASSWORD`: qBittorrent password
 - `USE_PLEX`: TRUE or FALSE (If not true, then you can leave the other plex variables blank)
