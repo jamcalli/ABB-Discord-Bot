@@ -1,7 +1,5 @@
 # ✨🤖AudioBook Bay Scraper - Discord Bot🤖✨
 
-*Disclaimer. This was a personal project to learn DiscordJS and TypeScript. Go easy on me. 
-
 ## Overview
 
 This discord bot serves a very niche function: to interactively scrape audiobooks from AudioBook Bay from within discord. 
