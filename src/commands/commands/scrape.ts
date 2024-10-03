@@ -8,10 +8,17 @@ import { fixCoverUrls, trimSearchResults } from "../../utils/validation.ts";
 import { logger } from '../../bot.ts';
 import { bookBrowser } from "../../events/bookbrowser.ts";
 import { SearchResultItem } from "../../interface/scrape.interface";
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Get the command name from the environment variable
+const commandName = process.env.COMMAND_NAME || 'scrape'; 
 
 // Define the command data 
 const data = new SlashCommandBuilder()
-    .setName("scrape")
+    .setName(commandName)
     .setDescription("Validate spelling. Start with Author.")
     .addStringOption(option => 
         option.setName("author")
