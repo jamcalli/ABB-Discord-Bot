@@ -31,6 +31,11 @@ if (USE_PLEX === 'TRUE') {
 
   if (!PLEX_HOST || !PLEX_TOKEN || !PLEX_LIBRARY_NUM) {
     logger.error('Environment variables PLEX_HOST, PLEX_TOKEN, or PLEX_LIBRARY_NUM are not defined');
+  } else {
+    // Ensure PLEX_HOST ends with a slash
+    if (!PLEX_HOST.endsWith('/')) {
+      PLEX_HOST += '/';
+    }
   }
 }
 
@@ -47,8 +52,17 @@ export const qbittorrent = new QBittorrent(config);
 // Function to download a magnet link using QBittorrent
 export async function downloadMagnet(magnet: string) {
   try {
-     // Attempting to add the magnet link to QBittorrent
-     await qbittorrent.addMagnet(magnet); 
+    // Fetching the optional category environment variable
+    const category = process.env.QBITTORRENT_CATEGORY;
+
+    // Creating options object for addMagnet
+    const options: { category?: string } = {};
+    if (category) {
+      options.category = category;
+    }
+
+    // Attempting to add the magnet link to QBittorrent with the optional category
+    await qbittorrent.addMagnet(magnet, options);
   } catch (error) {
     // Checking if the error is a known "sticky magnet" error
     if (error instanceof Error && error.message.includes('torrents/add": <no response>')) {
@@ -56,9 +70,9 @@ export async function downloadMagnet(magnet: string) {
       logger.error(`Sticky magnet: should still work - ${error.message}`);
     } else {
       // If the error is not a known "sticky magnet" error, rethrowing it
-      throw error; 
+      throw error;
     }
-  } 
+  }
 }
 
 // Class to manage a queue of tasks

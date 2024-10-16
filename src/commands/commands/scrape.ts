@@ -55,7 +55,7 @@ if (!siteIsUp) {
 }
 
 // Edit the reply
-await interaction.editReply("Scaping for your query...");
+await interaction.editReply("Scraping for your query...");
 
 // Get the search parameters
 const searchAuthor = (interaction.options as any).getString('author');

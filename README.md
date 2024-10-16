@@ -48,6 +48,7 @@ Set the following environment variables:
 - `QBITTORRENT_HOST`: qBittorrent host address (e.g., http://localhost:6500).
 - `QBITTORRENT_USERNAME`: qBittorrent username
 - `QBITTORRENT_PASSWORD`: qBittorrent password
+- `QBITTORRENT_CATEGORY`: qBittorrent category. This is an option env variable. Used for organizational purposes. 
 - `USE_PLEX`: TRUE or FALSE (If not true, then you can leave the other plex variables blank)
 - `PLEX_HOST`: Plex server address (e.g., http://localhost:32400)
 - `PLEX_TOKEN`: This is your X-Plex-Token. Find out how to get yours [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
@@ -64,6 +65,7 @@ DISCORD_GUILD_ID=YOUR_DISCORD_GUILD_ID
 QBITTORRENT_HOST=YOUR_QBITTORRENT_HOST
 QBITTORRENT_USERNAME=YOUR_QBITTORRENT_USERNAME
 QBITTORRENT_PASSWORD=YOUR_QBITTORRENT_PASSWORD
+QBITTORRENT_CATEGORY=QBITTORRENT_CATEGORY
 USE_PLEX=TRUE
 PLEX_HOST=YOUR_PLEX_HOST
 PLEX_TOKEN=YOUR_PLEX_TOKEN
