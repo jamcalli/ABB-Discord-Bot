@@ -26,30 +26,33 @@ jobs:
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: Latest
           release_name: ${{ env.RELEASE_NAME }}
           draft: false
           prerelease: false
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload docker-compose.yml
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./docker-compose.yml
           asset_name: docker-compose.yml
           asset_content_type: application/octet-stream
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload example.env
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./example.env
           asset_name: example.env
           asset_content_type: application/octet-stream
-          token: ${{ secrets.GITHUB_TOKEN }}
 
   build_and_push:
     name: Build and Push Docker Image
