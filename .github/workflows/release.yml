@@ -33,9 +33,26 @@ jobs:
           release_name: ${{ env.RELEASE_NAME }}
           draft: false
           prerelease: false
-          files: |
-            docker-compose.yml
-            example.env
+
+      - name: Upload docker-compose.yml
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./docker-compose.yml
+          asset_name: docker-compose.yml
+          asset_content_type: application/octet-stream
+
+      - name: Upload example.env
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./example.env
+          asset_name: example.env
+          asset_content_type: application/octet-stream
 
   build_and_push:
     name: Build and Push Docker Image
